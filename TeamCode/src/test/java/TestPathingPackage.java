@@ -4,12 +4,11 @@ import org.firstinspires.ftc.teamcode.FakeOpMode;
 import org.firstinspires.ftc.teamcode.Interfaces.OpModeI;
 import org.firstinspires.ftc.teamcode.Pathing.PathController;
 import org.firstinspires.ftc.teamcode.Pathing.PidParamCollection;
-import org.firstinspires.ftc.teamcode.Pathing.PidParams;
 import org.junit.Test;
 
-import Fakes.FakeHardware;
-import Fakes.FakeLog;
-import Fakes.FakeTimeSource;
+import org.firstinspires.ftc.teamcode.Fakes.FakeHardware;
+import org.firstinspires.ftc.teamcode.Fakes.FakeLog;
+import org.firstinspires.ftc.teamcode.Fakes.FakeTimeSource;
 
 public class TestPathingPackage {
 

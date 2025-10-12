@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Fakes.FakeHardware;
 import org.firstinspires.ftc.teamcode.Implementations.TelemetryWrapper;
+import org.firstinspires.ftc.teamcode.Interfaces.HardwareI;
 import org.firstinspires.ftc.teamcode.Interfaces.TelemetryI;
 import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
 import org.firstinspires.ftc.teamcode.TelemetryHelper;
@@ -15,8 +17,8 @@ public class HighTel extends LinearOpMode {
     TelemetryI mytelem = new TelemetryWrapper(this.telemetry);
     @Override
     public void runOpMode() throws InterruptedException {
-        hw = new Hardware(hardwareMap);
-//
+        //hw = new Hardware(hardwareMap);
+        hw = new FakeHardware();
         FieldCentricPowerLevels fieldCentricPowerLevels = new FieldCentricPowerLevels();
 
         initializeExtenderGripPositions();
@@ -241,7 +243,7 @@ public class HighTel extends LinearOpMode {
         }
     }
 
-    Hardware hw;
+    HardwareI hw;
 
     // following are only used to track how far moved for telemetry.
     double startEncX = 0;
