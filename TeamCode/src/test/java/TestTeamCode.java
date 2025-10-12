@@ -15,7 +15,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import org.firstinspires.ftc.teamcode.Fakes.FakeTimeSource;
+import Fakes.FakeTimeSource;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestTeamCode {
