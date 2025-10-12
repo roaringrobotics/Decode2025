@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Interfaces.LogI;
-import org.firstinspires.ftc.teamcode.Math.Matrix2;
+import org.firstinspires.ftc.teamcode.Math.RotationMatrix2d;
 import org.firstinspires.ftc.teamcode.Math.Vector2;
 import org.firstinspires.ftc.teamcode.Interfaces.OpModeI;
 import org.firstinspires.ftc.teamcode.TelemetryHelper;
@@ -124,8 +124,8 @@ public class PathController {
         // Rotate the vector based on robot heading to
         // get the power vector needed to drive that direction.
         double heading = lastPose.getHeading(AngleUnit.RADIANS);
-        robotToFieldRotation.setRotation(heading, AngleUnit.RADIANS);
-        robotRelativePowerVector = robotToFieldRotation.mult(motionVector);
+        robotToFieldRotation.setRotation(-heading, AngleUnit.RADIANS);
+        robotRelativePowerVector = robotToFieldRotation.multiply(motionVector);
 
         // Calculate rotation correction using PID.
         headingPid.setTargetPoint(targetHeadingDeg);
@@ -241,7 +241,7 @@ public class PathController {
     double frontRightPower;
     double backLeftPower;
     double backRightPower;
-    Matrix2 robotToFieldRotation = new Matrix2();
+    RotationMatrix2d robotToFieldRotation = new RotationMatrix2d();
     Vector2 robotRelativePowerVector = new Vector2(0,0);
 
     PidParamSet pidParams;

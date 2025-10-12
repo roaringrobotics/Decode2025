@@ -42,11 +42,6 @@ public class Vector2 {
         this.y*=gain;
     }
 
-    public void subtractInPlace(@NonNull Pose2D currentPose, @NonNull Vector2 targetLocation) {
-        this.x = currentPose.getX(DistanceUnit.INCH) -  targetLocation.x;
-        this.y = currentPose.getY(DistanceUnit.INCH) -  targetLocation.y;
-    }
-
     public void subtractInPlace(@NonNull Vector2 targetLocation, @NonNull Pose2D currentPose) {
         this.x = targetLocation.x - currentPose.getX(DistanceUnit.INCH);
         this.y = targetLocation.y - currentPose.getY(DistanceUnit.INCH);

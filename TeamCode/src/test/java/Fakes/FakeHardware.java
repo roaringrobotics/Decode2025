@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Interfaces.HardwareI;
 import org.firstinspires.ftc.teamcode.Interfaces.LogI;
 import org.firstinspires.ftc.teamcode.Interfaces.TimeSourceI;
-import org.firstinspires.ftc.teamcode.Math.Matrix2;
+import org.firstinspires.ftc.teamcode.Math.RotationMatrix2d;
 import org.firstinspires.ftc.teamcode.Math.Vector2;
 
 // Simple robot drive train simulation for unit testing.
@@ -134,7 +134,7 @@ public class FakeHardware implements HardwareI {
         velocityInchesSec = Vector2.add(leftVelocity, rightVelocity);
         velocityInchesSec.scale(.5);
         // Rotate the velocity
-        velocityInchesSec = rotation.mult(velocityInchesSec);
+        velocityInchesSec = rotation.multiply(velocityInchesSec);
 
         // Update the location based on the speed and delta time.
         location = Vector2.add(location, Vector2.mult(velocityInchesSec, deltaTimeSec));
@@ -174,7 +174,7 @@ public class FakeHardware implements HardwareI {
     // to simulate rotation of the robot given different wheel speeds.
     double wheelTrackRadiusInches = 8;
 
-    Matrix2 rotation = new Matrix2();
+    RotationMatrix2d rotation = new RotationMatrix2d();
 
     double imuHeading = 0;
 }
