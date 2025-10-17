@@ -16,10 +16,10 @@ public class Hardware implements HardwareI {
 
     public Hardware(HardwareMap hardwareMap) throws InterruptedException {
         InitDriveMotors(hardwareMap);
-        InitLiftMotors(hardwareMap);
-        InitExtendServos(hardwareMap);
-        InitGripServos(hardwareMap);
-        InitImu(hardwareMap);
+//        InitLiftMotors(hardwareMap);
+//        InitExtendServos(hardwareMap);
+//        InitGripServos(hardwareMap);
+//        InitImu(hardwareMap);
     }
 
     private void InitImu(HardwareMap hardwareMap) {
