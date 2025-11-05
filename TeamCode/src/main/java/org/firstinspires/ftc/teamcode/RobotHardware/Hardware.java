@@ -19,7 +19,7 @@ public class Hardware implements HardwareI {
 //        InitLiftMotors(hardwareMap);
 //        InitExtendServos(hardwareMap);
 //        InitGripServos(hardwareMap);
-//        InitImu(hardwareMap);
+        InitImu(hardwareMap);
     }
 
     private void InitImu(HardwareMap hardwareMap) {
@@ -65,28 +65,9 @@ public class Hardware implements HardwareI {
         blackLift.setTargetPosition(0);
     }
 
-    private void InitDriveMotors(HardwareMap hardwareMap) {
-        // Drive Motors
-        // Names need to match configuration on driver hub
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        backLeft = hardwareMap.dcMotor.get("backLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        backRight = hardwareMap.dcMotor.get("backRight");
 
-//      For this Robot(Pickle), you have to make the right wheels reversed.
 
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    }
 
-    public DcMotor frontRight;
-    public DcMotor frontLeft;
-    public DcMotor backLeft;
-    public DcMotor backRight;
     public DcMotor blueLift;
     public DcMotor blackLift;
     public Servo blackExtend;

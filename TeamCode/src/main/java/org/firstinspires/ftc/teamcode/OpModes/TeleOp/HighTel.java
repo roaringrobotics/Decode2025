@@ -19,14 +19,11 @@ public class HighTel extends LinearOpMode {
 //
         FieldCentricPowerLevels fieldCentricPowerLevels = new FieldCentricPowerLevels();
 
-        initializeExtenderGripPositions();
 
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()) {
             controlLift();
-            controlExtender();
-            controlGrip();
             controlResetImu();
             double powerScale = controlScalePower();
             driveFieldCentric(
@@ -36,13 +33,6 @@ public class HighTel extends LinearOpMode {
                     fieldCentricPowerLevels);
             updateTelemetry();
         }
-    }
-
-    private void initializeExtenderGripPositions() {
-        hw.blackGrip.setPosition(0.5);
-        hw.blueGrip.setPosition(0.5);
-        hw.blackExtend.setPosition(0.1);
-        hw.blueExtend.setPosition(0.9);
     }
 
     private void controlLift() {
@@ -217,29 +207,7 @@ public class HighTel extends LinearOpMode {
         return powerScale;
     }
 
-    private void controlGrip() {
-        // Check joystick to control grip.
-        // using gamepad 2.
-        if (gamepad2.b) {
-            hw.blueGrip.setPosition(1);
-            hw.blackGrip.setPosition(0);
-        } else if (gamepad2.a) {
-            hw.blueGrip.setPosition(0);
-            hw.blackGrip.setPosition(1);
-        }
-    }
 
-    private void controlExtender() {
-        // Check joystick to control extender
-        // using gamepad 2.
-        if (gamepad2.dpad_right) {
-            hw.blueExtend.setPosition(0.05);
-            hw.blackExtend.setPosition(0.95);
-        } else if (gamepad2.dpad_left) {
-            hw.blueExtend.setPosition(0.95);
-            hw.blackExtend.setPosition(0.05);
-        }
-    }
 
     Hardware hw;
 

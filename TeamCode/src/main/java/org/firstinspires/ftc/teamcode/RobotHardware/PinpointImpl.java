@@ -38,6 +38,7 @@ public class PinpointImpl implements ImuPositionI {
             return pp.getHeading();
     }
 
+    // swap the X Y from the PP so X is left/right and Y is forward/backward
     @Override
     public double getPosY() {
         return pp.getPosY() * Constants.mmToInch;
@@ -45,7 +46,7 @@ public class PinpointImpl implements ImuPositionI {
 
     @Override
     public double getPosX() {
-        return pp.getPosX() * Constants.mmToInch;
+        return pp.getPosX () * Constants.mmToInch;
     }
 
     @Override

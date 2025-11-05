@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -11,9 +13,8 @@ import org.firstinspires.ftc.teamcode.Interfaces.TelemetryI;
 import org.firstinspires.ftc.teamcode.Pathing.PathController;
 import org.firstinspires.ftc.teamcode.Pathing.PidParamCollection;
 import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
-import org.firstinspires.ftc.teamcode.TelemetryHelper;
-
-@TeleOp
+import org.firstinspires.ftc.teamcode.TelemetryHelper;\[]
+@Autonomous
 public class ExampleNewPathing extends LinearOpMode {
 
     // This runs as soon as init it pushed.
@@ -26,15 +27,15 @@ public class ExampleNewPathing extends LinearOpMode {
 
         LinearOpModeImpl ourOp = new LinearOpModeImpl(this);
 
-        PathController pathing = new PathController(hw, ourOp, 0.3,
+        PathController pathing = new PathController(hw, ourOp, 0.2,
                 PidParamCollection.ParamSetName.UNIT_TEST_SIM,
                 new SystemTimeSource(), new AndroidLog());
 
-        pause();
+        //pause();
         // Move forward 24 inches.
-        pathing.setTargetHeadingDeg(0);
-        pathing.setTargetLocation(24,0);
-        pathing.run();
+        //pathing.setTargetHeadingDeg(0);
+        pathing.setTargetLocation(12,0);
+        pathing.run(20);
 
 //        pause();
 //        pathing.setTargetHeadingDeg(45);
@@ -48,9 +49,9 @@ public class ExampleNewPathing extends LinearOpMode {
     }
 
     private void pause() {
-        TelemetryHelper.UpdateTelemetry(myTelem, "Push B to continue...");
-        while(!gamepad1.b)
-            sleep(250);
+        //TelemetryHelper.UpdateTelemetry(myTelem, "Push B to continue...");
+        //while(!gamepad1.b)
+            //sleep(250);
     }
 
     Hardware hw;
