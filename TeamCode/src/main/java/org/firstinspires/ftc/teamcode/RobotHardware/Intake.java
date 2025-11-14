@@ -46,4 +46,11 @@ public class Intake {
     public void setRunMode(DcMotor.RunMode mode) {
         motor.setMode(mode);
     }
+
+    public void startIntake() {
+        setPower(1.0);
+    }
+    public void stopIntake() {
+        setPower(0.0);
+    }
 }

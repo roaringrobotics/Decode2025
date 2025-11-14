@@ -3,65 +3,71 @@ package org.firstinspires.ftc.teamcode.RobotHardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Shooter {
-
-    private final DcMotor topMotor;
-    private final DcMotor bottomMotor;
+    private final DcMotor shooterMotor;
+    private final Servo leftServo;
+    private final Servo rightServo;
 
     public Shooter(HardwareMap hardwareMap) {
-        topMotor = hardwareMap.get(DcMotor.class, "shooterTop");
-        bottomMotor = hardwareMap.get(DcMotor.class, "shooterBottom");
+        shooterMotor = hardwareMap.get(DcMotor.class, "shooterBottom");
 
+        // Initialize servos (use hardware names configured in your robot config)
+        leftServo = hardwareMap.get(Servo.class, "shooterTopServo");
+        rightServo = hardwareMap.get(Servo.class, "shooterBottomServo");
         // Reverse bottom motor so both spin the same physical direction
-        bottomMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Default to BRAKE when power is zero
-        topMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bottomMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Default run mode (change as needed)
-        topMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bottomMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void setTopPower(double power) {
-        topMotor.setPower(power);
+    public void setPower(double power) {
+        shooterMotor.setPower(power);
     }
 
-    public void setBottomPower(double power) {
-        bottomMotor.setPower(power);
+    public void startShooterMotor() {
+        setPower(1.0);
     }
 
-    public void setBothPower(double power) {
-        setTopPower(power);
-        setBottomPower(power);
-    }
-
-    public void setPowers(double topPower, double bottomPower) {
-        setTopPower(topPower);
-        setBottomPower(bottomPower);
-    }
-
-    public double getTopPower() {
-        return topMotor.getPower();
+    public void setPowers(double topPower, double power) {
+        setPower(power);
     }
 
     public double getBottomPower() {
-        return bottomMotor.getPower();
+        return shooterMotor.getPower();
     }
 
-    public void stop() {
-        setBothPower(0.0);
+    public void stopShooterMotor() {
+        startShooterMotor();
     }
 
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
-        topMotor.setZeroPowerBehavior(behavior);
-        bottomMotor.setZeroPowerBehavior(behavior);
+        shooterMotor.setZeroPowerBehavior(behavior);
     }
 
     public void setRunMode(DcMotor.RunMode mode) {
-        topMotor.setMode(mode);
-        bottomMotor.setMode(mode);
+        shooterMotor.setMode(mode);
+    }
+
+    public void shoot() {
+        leftServo.setDirection(Servo.Direction.FORWARD);  // Adjust Forward vs Backswards soon
+        rightServo.setDirection(Servo.Direction.FORWARD);
+    }
+    public void stopShoot() {
+        leftServo.setPosition(0.0);
+        rightServo.setPosition(0.0);
+    }
+
+    public void toggleShootMotor() {
+        if (shooterMotor.getPower() == 0.0) {
+            startShooterMotor();
+        } else {
+            stopShooterMotor();
+        }
     }
 }
