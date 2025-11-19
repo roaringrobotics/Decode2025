@@ -24,6 +24,8 @@ public class TeleOpDecode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         driveTrain = new DriveTrain(hardwareMap);
         hw = new Hardware(hardwareMap);
+        shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
         waitForStart();
         float deadZone = 0.75F;
         while (opModeIsActive()) {
