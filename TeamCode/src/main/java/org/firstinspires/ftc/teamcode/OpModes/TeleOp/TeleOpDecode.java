@@ -14,7 +14,7 @@ public class TeleOpDecode extends LinearOpMode {
     private DriveTrain driveTrain;
     private Shooter shooter;
     private Hardware hw;
-    private Intake intake;
+   // private Intake intake;
     private ButtonState lastAButtonState = ButtonState.NOT_PRESSED;
     private enum ButtonState {
         PRESSED,
@@ -25,7 +25,7 @@ public class TeleOpDecode extends LinearOpMode {
         driveTrain = new DriveTrain(hardwareMap);
         hw = new Hardware(hardwareMap);
         shooter = new Shooter(hardwareMap);
-        intake = new Intake(hardwareMap);
+      //  intake = new Intake(hardwareMap);
         waitForStart();
         float deadZone = 0.75F;
         while (opModeIsActive()) {
@@ -49,11 +49,12 @@ public class TeleOpDecode extends LinearOpMode {
                 shooter.shoot();
             }
             if (gamepad2.b) {
-                intake.startIntake();
+               // intake.startIntake();
             }
             else{
-                intake.stopIntake();
+               // intake.stopIntake();
             }
+
 
         }
 

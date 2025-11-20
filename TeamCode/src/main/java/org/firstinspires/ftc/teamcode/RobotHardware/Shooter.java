@@ -3,19 +3,18 @@ package org.firstinspires.ftc.teamcode.RobotHardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 public class Shooter {
     private final DcMotor shooterMotor;
-    private final Servo leftServo;
-    private final Servo rightServo;
+  //  private final Servo leftServo;
+  //  private final Servo rightServo;
 
     public Shooter(HardwareMap hardwareMap) {
-        shooterMotor = hardwareMap.get(DcMotor.class, "shooterBottom");
+        shooterMotor = hardwareMap.get(DcMotor.class, "shooter");
 
         // Initialize servos (use hardware names configured in your robot config)
-        leftServo = hardwareMap.get(Servo.class, "shooterTopServo");
-        rightServo = hardwareMap.get(Servo.class, "shooterBottomServo");
+      //  leftServo = hardwareMap.get(Servo.class, "shooterTopServo");
+      //  rightServo = hardwareMap.get(Servo.class, "shooterBottomServo");
         // Reverse bottom motor so both spin the same physical direction
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -32,14 +31,7 @@ public class Shooter {
 
     public void startShooterMotor() {
         setPower(1.0);
-    }
 
-    public void setPowers(double topPower, double power) {
-        setPower(power);
-    }
-
-    public double getBottomPower() {
-        return shooterMotor.getPower();
     }
 
     public void stopShooterMotor() {
@@ -55,12 +47,12 @@ public class Shooter {
     }
 
     public void shoot() {
-        leftServo.setDirection(Servo.Direction.FORWARD);  // Adjust Forward vs Backswards soon
-        rightServo.setDirection(Servo.Direction.FORWARD);
+   //     leftServo.setDirection(Servo.Direction.FORWARD);  // Adjust Forward vs Backswards soon
+   //     rightServo.setDirection(Servo.Direction.FORWARD);
     }
     public void stopShoot() {
-        leftServo.setPosition(0.0);
-        rightServo.setPosition(0.0);
+   //     leftServo.setPosition(0.0);
+   //     rightServo.setPosition(0.0);
     }
 
     public void toggleShootMotor() {

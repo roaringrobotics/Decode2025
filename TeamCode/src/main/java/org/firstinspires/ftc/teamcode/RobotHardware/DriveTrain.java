@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
+import org.firstinspires.ftc.teamcode.Interfaces.LogI;
 
 public class DriveTrain {
     public DcMotor frontRight;
@@ -12,7 +14,7 @@ public class DriveTrain {
     public DcMotor backLeft;
     public DcMotor backRight;
     public FieldCentricPowerLevels fcPowerLevels = new FieldCentricPowerLevels();
-
+    private final AndroidLog log = new AndroidLog();
     public DriveTrain(HardwareMap hardwareMap)
     {
 
@@ -23,10 +25,9 @@ public class DriveTrain {
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backRight = hardwareMap.dcMotor.get("backRight");
 
-//      For this Robot(Pickle), you have to make the right wheels reversed.
 
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -94,19 +95,25 @@ public class DriveTrain {
         getFieldCentricPowerLevels(
                 leftStickY, leftStickX,
                 rightStickX, botHeading);
-
+        log.d("PathController", "===========================================");
+        log.d("PathController", String.format("fl: %f", fcPowerLevels.frontLeftPower));
+        log.d("PathController", String.format("fr: %f", fcPowerLevels.frontRightPower));
+        log.d("PathController", String.format("bl: %f", fcPowerLevels.backLeftPower));
+        log.d("PathController", String.format("br: %f", fcPowerLevels.backRightPower));
+        log.d("PathController", "===========================================");
+        // The power scale has to be negative for two of them because their problematic
         frontLeft.setPower(fcPowerLevels.frontLeftPower * powerScale);
-        backLeft.setPower(fcPowerLevels.backLeftPower * powerScale);
-        frontRight.setPower(fcPowerLevels.frontRightPower * powerScale);
+        backLeft.setPower(fcPowerLevels.backLeftPower * -powerScale);
+        frontRight.setPower(fcPowerLevels.frontRightPower * -powerScale);
         backRight.setPower(fcPowerLevels.backRightPower * powerScale);
     }
     private void getFieldCentricPowerLevels(
-            double leftStickY, double leftStickX,
-            double rightStickX, double botHeading) {
+            double drive, double strafe,
+            double rotate, double botHeading) {
 
-        // leftStickY forward/backward [-1.0, 1.0]
-        // leftStickX strafe [-1.0, 1.0]
-        // rightStickX rotate [-1.0, 1.0].
+        // drive forward/backward [-1.0, 1.0]
+        // strafe strafe [-1.0, 1.0]
+        // rotate rotate [-1.0, 1.0].
 
         // Rotate joystick input vectors for field centric control.
 
@@ -116,22 +123,22 @@ public class DriveTrain {
         // h = botHeading
         // lsx = left stick x value
         // lsy = left stick y value.
-        double rotatedX = leftStickX * Math.cos(-botHeading) - leftStickY * Math.sin(-botHeading);
-        double rotatedY = leftStickX * Math.sin(-botHeading) + leftStickY * Math.cos(-botHeading);
+        double rotatedX = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
+        double rotatedY = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
 
         // Don't know why the rotated value of left stick x is scale by 1.1.
         // It's not in online example code.
-        rotatedX = rotatedX * 1.1;
+        // rotatedX = rotatedX * 1.1;
 
         // Normalize output power [-1.0-1.0]
-        double vectorSum = Math.abs(rotatedY) + Math.abs(rotatedX) + Math.abs(rightStickX);
+        double vectorSum = Math.abs(rotatedY) + Math.abs(rotatedX) + Math.abs(rotate);
         double normalize = 1.0 / Math.max(vectorSum, 1.0);
 
         // Set normalized field centric power levels.
-        fcPowerLevels.frontLeftPower = (rotatedY + rotatedX + rightStickX) * normalize;
-        fcPowerLevels.backLeftPower = (rotatedY - rotatedX + rightStickX) * normalize;
-        fcPowerLevels.frontRightPower = (rotatedY - rotatedX - rightStickX) * normalize;
-        fcPowerLevels.backRightPower = (rotatedY + rotatedX - rightStickX) * normalize;
+        fcPowerLevels.frontLeftPower = -(rotatedY + rotatedX - rotate) * normalize;
+        fcPowerLevels.backLeftPower = (rotatedY - rotatedX - rotate) * normalize;
+        fcPowerLevels.frontRightPower = (rotatedY - rotatedX + rotate) * normalize;
+        fcPowerLevels.backRightPower = -(rotatedY + rotatedX + rotate) * normalize;
     }
 
     // Class to hold field centric power level output from getFieldCentricPowerLevels
