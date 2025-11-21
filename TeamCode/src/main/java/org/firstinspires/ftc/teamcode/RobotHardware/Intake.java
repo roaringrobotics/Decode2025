@@ -49,9 +49,10 @@ public class Intake {
     }
 
     public void startIntake() {
-        setPower(-0.5);
+        setPower(-0.75);
     }
     public void stopIntake() {
         setPower(0.0);
     }
+    public void reverseIntake(){setPower(0.75);}
 }
