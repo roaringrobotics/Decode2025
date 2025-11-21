@@ -1,20 +1,22 @@
 package org.firstinspires.ftc.teamcode.RobotHardware;
 
+import  com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Shooter {
     private final DcMotor shooterMotor;
-  //  private final Servo leftServo;
-  //  private final Servo rightServo;
+    private final Servo leftServo;
+    private final Servo rightServo;
+
 
     public Shooter(HardwareMap hardwareMap) {
         shooterMotor = hardwareMap.get(DcMotor.class, "shooter");
 
         // Initialize servos (use hardware names configured in your robot config)
-      //  leftServo = hardwareMap.get(Servo.class, "shooterTopServo");
-      //  rightServo = hardwareMap.get(Servo.class, "shooterBottomServo");
+        leftServo = hardwareMap.get(Servo.class, "shooterTopServo");
+        rightServo = hardwareMap.get(Servo.class, "shooterBottomServo");
         // Reverse bottom motor so both spin the same physical direction
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -54,7 +56,9 @@ public class Shooter {
    //     leftServo.setPosition(0.0);
    //     rightServo.setPosition(0.0);
     }
+     public void flipper() {
 
+     }
     public void toggleShootMotor() {
         if (shooterMotor.getPower() == 0.0) {
             startShooterMotor();
