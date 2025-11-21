@@ -11,7 +11,7 @@ public class Intake {
 
     // Default constructor uses device name "intakeMotor"
     public Intake(HardwareMap hardwareMap) {
-        this(hardwareMap, "intakeMotor");
+        this(hardwareMap, "intake");
     }
 
     // Constructor allowing a custom device name
@@ -21,6 +21,7 @@ public class Intake {
         // Default configuration: no direction reversal here (change if needed)
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setPower(double power) {
@@ -48,7 +49,7 @@ public class Intake {
     }
 
     public void startIntake() {
-        setPower(1.0);
+        setPower(-0.5);
     }
     public void stopIntake() {
         setPower(0.0);

@@ -7,16 +7,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Shooter {
     private final DcMotor shooterMotor;
-    private final Servo leftServo;
-    private final Servo rightServo;
+    //private final Servo shooterTopServo;
+  //  private final Servo shooterBottomServo;
 
 
     public Shooter(HardwareMap hardwareMap) {
         shooterMotor = hardwareMap.get(DcMotor.class, "shooter");
 
         // Initialize servos (use hardware names configured in your robot config)
-        leftServo = hardwareMap.get(Servo.class, "shooterTopServo");
-        rightServo = hardwareMap.get(Servo.class, "shooterBottomServo");
+        //shooterTopServo = hardwareMap.get(Servo.class, "shooterTopServo");
+        //shooterBottomServo = hardwareMap.get(Servo.class, "shooterBottomServo");
         // Reverse bottom motor so both spin the same physical direction
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -49,12 +49,12 @@ public class Shooter {
     }
 
     public void shoot() {
-   //     leftServo.setDirection(Servo.Direction.FORWARD);  // Adjust Forward vs Backswards soon
-   //     rightServo.setDirection(Servo.Direction.FORWARD);
+   //     shooterTopServo.setDirection(Servo.Direction.FORWARD);  // Adjust Forward vs Backswards soon
+   //     shooterBottomServo.setDirection(Servo.Direction.FORWARD);
     }
     public void stopShoot() {
-   //     leftServo.setPosition(0.0);
-   //     rightServo.setPosition(0.0);
+   //     shooterTopServo.setPosition(0.0);
+   //     shooterBottomServo.setPosition(0.0);
     }
      public void flipper() {
 
