@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
+import android.speech.tts.TextToSpeech;
+
+
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
@@ -24,6 +29,20 @@ public class TeleOpDecode extends LinearOpMode {
         PRESSED,
         NOT_PRESSED
     }
+    private boolean motorRunning;
+    private enum ShooterState {
+        RUNNING,
+        STOPPED
+    }
+
+    // 2. Set the initial state
+    private ShooterState shooterState = ShooterState.STOPPED;
+
+    // 3. Add a timer to debounce the button
+    private ElapsedTime buttonTimer = new ElapsedTime();
+
+
+
 
 
     public void runOpMode() throws InterruptedException {
@@ -53,11 +72,35 @@ public class TeleOpDecode extends LinearOpMode {
             ButtonState currentAButtonState = gamepad2.a ? ButtonState.PRESSED : ButtonState.NOT_PRESSED;
             if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.PRESSED) {
                 lastAButtonState = currentAButtonState;
-                shooter.startShoot();
+                shooter.startShooterMotor();
             } if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.NOT_PRESSED) {
                 lastAButtonState = currentAButtonState;
-                shooter.stopShoot();
+                shooter.stopShooterMotor();
             }
+
+            if (gamepad2.aWasPressed()){
+                if(motorRunning){
+                    shooter.stopShoot();
+                    motorRunning = true;
+                } else {
+                    shooter.startShoot();
+                    motorRunning = false;
+                }
+            }
+            if (gamepad2.b && buttonTimer.seconds() > 0.3) {
+                buttonTimer.reset(); // Reset timer to prevent rapid toggling
+                switch (shooterState) {
+                    case STOPPED:
+                        shooter.startShooterMotor();
+                        shooterState = ShooterState.RUNNING;
+                        break;
+                    case RUNNING:
+                        shooter.stopShooterMotor();
+                        shooterState = ShooterState.STOPPED;
+                        break;
+                }
+            }
+
 
 
             if (gamepad2.dpad_right) {
