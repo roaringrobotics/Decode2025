@@ -74,7 +74,7 @@ public class TeleOpDecode extends LinearOpMode {
             ButtonState currentAButtonState = gamepad2.a ? ButtonState.PRESSED : ButtonState.NOT_PRESSED;
             if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.PRESSED) {
                 lastAButtonState = currentAButtonState;
-                shooter.startShooterMotor();
+                shooter.startShooterMotor(0.7);
             } if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.NOT_PRESSED) {
                 lastAButtonState = currentAButtonState;
                 shooter.stopShooterMotor();
@@ -93,7 +93,7 @@ public class TeleOpDecode extends LinearOpMode {
                 buttonTimer.reset(); // Reset timer to prevent rapid toggling
                 switch (shooterState) {
                     case STOPPED:
-                        shooter.startShooterMotor();
+                        shooter.startShooterMotor(0.7);
                         shooterState = ShooterState.RUNNING;
                         break;
                     case RUNNING:

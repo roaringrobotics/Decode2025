@@ -33,8 +33,8 @@ public class Shooter {
         shooterMotor.setPower(power);
     }
 
-    public void startShooterMotor() {
-        setPower(0.7);
+    public void startShooterMotor(double power) {
+        setPower(power);
 
     }
     public void stopShooterMotor() {
@@ -58,7 +58,7 @@ public class Shooter {
     }
      public void startShoot() {
         double power = 1.0;
-        blueServo.setPower(power);
+        blueServo.setPower(-power);
         blackServo.setPower(power);
      }
     //public void toggleShootMotor() {
