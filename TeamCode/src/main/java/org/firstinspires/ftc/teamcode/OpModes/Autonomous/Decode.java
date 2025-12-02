@@ -8,7 +8,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
+import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
+import org.firstinspires.ftc.teamcode.Math.Util;
 import org.firstinspires.ftc.teamcode.Pathing.PID;
+import org.firstinspires.ftc.teamcode.Pathing.PowerRampController;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
 import org.firstinspires.ftc.teamcode.RobotHardware.PinpointImpl;
@@ -45,7 +48,12 @@ public class Decode extends LinearOpMode {
         imu = new PinpointImpl(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
-        PID pid = new PID(0.1,0,0);
+        PID pid = new PID(0.85,0,0);
+        PID pidRotate = new PID(0.067,0,0);
+        PowerRampController rampDrive = new PowerRampController(
+                .2,
+                new SystemTimeSource());
+
 
 //        Through testing y's and x's are flipped
 //        instead of:
@@ -67,6 +75,8 @@ public class Decode extends LinearOpMode {
         double x = 0;
         double h = 0;
         double targetDistance = 0;
+        double mirrorField = 1;
+        String team = "Blue Side";
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         imu.reset();
@@ -76,6 +86,16 @@ public class Decode extends LinearOpMode {
         while (!isStarted() && !isStopRequested()) {
             telemetry.addData("Hint", "Waiting for start - update sensors/vision here");
             telemetry.update();
+            if (gamepad2.optionsWasPressed()) {
+                mirrorField = mirrorField * -1;
+            }
+            if (mirrorField == -1) {
+                team = "Red Side";
+            }
+            else {
+                team = "Blue Side";
+            }
+            telemetry.addData("Side", team);
             idle();
         }
 
@@ -96,10 +116,16 @@ public class Decode extends LinearOpMode {
         int count = 0;
         while (Math.abs(x) < targetDistance && opModeIsActive()) {
             double PIDpower = pid.calculate(targetDistance, x);
-            driveTrain.setFrontLeftPower(0.5 * PIDpower);
-            driveTrain.setFrontRightPower(0.5 * PIDpower);
-            driveTrain.setBackLeftPower(0.5 * PIDpower);
-            driveTrain.setBackRightPower(0.5 * PIDpower);
+            PIDpower = Util.clamp(PIDpower,-1,1);
+            log.d("", "===========================================");
+            log.d("Power1", String.valueOf(PIDpower));
+            PIDpower = rampDrive.getValue(PIDpower);
+            log.d("Power2", String.valueOf(PIDpower));
+
+            driveTrain.setFrontLeftPower (PIDpower);
+            driveTrain.setFrontRightPower(PIDpower);
+            driveTrain.setBackLeftPower(PIDpower);
+            driveTrain.setBackRightPower(PIDpower);
 
             // Update y position from hardware (placeholder logic)
             imu.update();
@@ -137,16 +163,20 @@ public class Decode extends LinearOpMode {
 
         // Rotate
         count = 0;
-        double targetHeading = 45;
+        double targetHeading = 38 * mirrorField;
+        h *= mirrorField;
+        rampDrive.Reset();
         while (h < targetHeading && opModeIsActive()) {
-            double PIDpower = pid.calculate(targetHeading, h);
-            driveTrain.setFrontLeftPower(-0.5 * PIDpower);
-            driveTrain.setFrontRightPower(0.5 * PIDpower);
-            driveTrain.setBackLeftPower(-0.5 * PIDpower);
-            driveTrain.setBackRightPower(0.5 * PIDpower);
+            double PIDpower = pidRotate.calculate(targetHeading, h);
+            PIDpower = Util.clamp(PIDpower,-1,1);
+            PIDpower = rampDrive.getValue(PIDpower);
+            driveTrain.setFrontLeftPower(-PIDpower * mirrorField);
+            driveTrain.setFrontRightPower(PIDpower * mirrorField);
+            driveTrain.setBackLeftPower(-PIDpower * mirrorField);
+            driveTrain.setBackRightPower(PIDpower * mirrorField);
 
             imu.update();
-            h = imu.getHeading(AngleUnit.DEGREES);
+            h = imu.getHeading(AngleUnit.DEGREES) * mirrorField;
             telemetry.update();
             if (count > 200) {
                 log.d("", "===========================================");
@@ -175,11 +205,12 @@ public class Decode extends LinearOpMode {
             log.d("Heading: ", String.valueOf(h));
 
 
-            shooter.startShooterMotor(0.5);
+            shooter.startShooterMotor(0.6);
             sleep(4000);
             shooter.startShoot();
             intake.startIntake();
             sleep(5000);
+
 
 
 

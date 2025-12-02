@@ -7,7 +7,7 @@ public class PowerRampController {
     public double maxChange;
     public double lastValue;
     public double lastTimeSetMs;
-    public double minTimeMs = 20;
+    public double minTimeMs = 10;
     TimeSourceI timeSource;
 
     public PowerRampController(double maxChange, TimeSourceI ts)
@@ -17,10 +17,16 @@ public class PowerRampController {
         lastTimeSetMs = Long.MIN_VALUE;
     }
 
+    public void Reset()
+    {
+        lastTimeSetMs = Long.MIN_VALUE;
+    }
+
     public double getValue(double newValue)
     {
+        timeSource.update();
         double currentTime = timeSource.currentTimeMillis();
-        double deltaTime = (currentTime - lastTimeSetMs);
+        double deltaTime = Math.abs(currentTime - lastTimeSetMs);
 
         if(deltaTime < minTimeMs) {
             // Wait at least minTimeSec seconds before changing again.
