@@ -132,7 +132,7 @@ public class DriveTrain {
 
         // Normalize output power [-1.0-1.0]
         double vectorSum = Math.abs(rotatedY) + Math.abs(rotatedX) + Math.abs(rotate);
-        double normalize = 5 / Math.max(vectorSum, 1.0);
+        double normalize = Math.max(vectorSum, 1.0);
 
         // Set normalized field centric power levels.
         fcPowerLevels.frontLeftPower = -(rotatedY + rotatedX - rotate) * normalize;

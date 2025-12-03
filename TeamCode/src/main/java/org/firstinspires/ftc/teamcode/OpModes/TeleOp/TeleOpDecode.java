@@ -31,7 +31,9 @@ public class TeleOpDecode extends LinearOpMode {
         PRESSED,
         NOT_PRESSED
     }
+
     private boolean motorRunning;
+
     private enum ShooterState {
         RUNNING,
         STOPPED
@@ -44,14 +46,12 @@ public class TeleOpDecode extends LinearOpMode {
     private ElapsedTime buttonTimer = new ElapsedTime();
 
 
-
-
-
     public void runOpMode() throws InterruptedException {
         driveTrain = new DriveTrain(hardwareMap);
         hw = new Hardware(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
+        double power;
         //  intake = new Intake(hardwareMap);
         waitForStart();
         float deadZone = 0.75F;
@@ -59,13 +59,14 @@ public class TeleOpDecode extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
-            driveTrain.driveFieldCentric(drive, strafe, rotate, 0.5, hw);
+            power = powerScaler();
+            driveTrain.driveFieldCentric(drive, strafe, rotate, power, hw);
 
 
             //if (gamepad2.left_trigger > 0.5) {
-                //shooter.startShooterMotor();
+            //shooter.startShooterMotor();
             //}else if (gamepad2.left_trigger < 0.5) {
-                //shooter.stopShooterMotor();
+            //shooter.stopShooterMotor();
             //}
 
             // if last time is was up and this time it's down toggle
@@ -75,13 +76,14 @@ public class TeleOpDecode extends LinearOpMode {
             if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.PRESSED) {
                 lastAButtonState = currentAButtonState;
                 shooter.startShooterMotor(0.7);
-            } if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.NOT_PRESSED) {
+            }
+            if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.NOT_PRESSED) {
                 lastAButtonState = currentAButtonState;
                 shooter.stopShooterMotor();
             }
 
-            if (gamepad2.aWasPressed()){
-                if(motorRunning){
+            if (gamepad2.aWasPressed()) {
+                if (motorRunning) {
                     shooter.stopShoot();
                     motorRunning = true;
                 } else {
@@ -104,14 +106,14 @@ public class TeleOpDecode extends LinearOpMode {
             }
 
 
-
             if (gamepad2.dpad_right) {
                 shooter.blueServo.setPower(-1);
                 shooter.blackServo.setPower(1);
             } else {
                 shooter.blueServo.setPower(0);
                 shooter.blackServo.setPower(0);
-            } if (gamepad2.dpad_left){
+            }
+            if (gamepad2.dpad_left) {
                 shooter.blueServo.setPower(1);
                 shooter.blackServo.setPower(-1);
             }
@@ -120,20 +122,34 @@ public class TeleOpDecode extends LinearOpMode {
             }
 
 
-                if (gamepad2.right_trigger > 0.5) {
-                    intake.startIntake();
-                } else {
-                    intake.stopIntake();
-                }
-                if (gamepad2.left_trigger > 0.5){
-                    intake.reverseIntake();
-                }
-
+            if (gamepad2.right_trigger > 0.5) {
+                intake.startIntake(0.75);
+            } else {
+                intake.stopIntake();
+            }
+            if (gamepad2.left_trigger > 0.5) {
+                intake.reverseIntake();
             }
 
+        }
 
-            // Class to hold field centric power level output from getFieldCentricPowerLevels
 
+        // Class to hold field centric power level output from getFieldCentricPowerLevels
+
+    }
+
+    private double powerScaler() {
+
+        if (gamepad1.right_bumper) {
+            return 0.5;
+
+        } else if (gamepad1.left_bumper) {
+            return 0.25;
+
+        } else {
+            return 1.0;
         }
     }
+}
+
 

@@ -48,8 +48,8 @@ public class Decode extends LinearOpMode {
         imu = new PinpointImpl(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
-        PID pid = new PID(0.85,0,0);
-        PID pidRotate = new PID(0.067,0,0);
+        PID pid = new PID(0.85, 0, 0);
+        PID pidRotate = new PID(0.02, 0, 0);
         PowerRampController rampDrive = new PowerRampController(
                 .2,
                 new SystemTimeSource());
@@ -91,8 +91,7 @@ public class Decode extends LinearOpMode {
             }
             if (mirrorField == -1) {
                 team = "Red Side";
-            }
-            else {
+            } else {
                 team = "Blue Side";
             }
             telemetry.addData("Side", team);
@@ -113,16 +112,19 @@ public class Decode extends LinearOpMode {
         telemetry.addData("Y Position", y);
         telemetry.addData("Heading", h);
         telemetry.addData("Target", targetDistance);
+
+        shooter.startShooterMotor(0.67);
+
         int count = 0;
         while (Math.abs(x) < targetDistance && opModeIsActive()) {
             double PIDpower = pid.calculate(targetDistance, x);
-            PIDpower = Util.clamp(PIDpower,-1,1);
+            PIDpower = Util.clamp(PIDpower, -1, 1);
             log.d("", "===========================================");
             log.d("Power1", String.valueOf(PIDpower));
             PIDpower = rampDrive.getValue(PIDpower);
             log.d("Power2", String.valueOf(PIDpower));
 
-            driveTrain.setFrontLeftPower (PIDpower);
+            driveTrain.setFrontLeftPower(PIDpower);
             driveTrain.setFrontRightPower(PIDpower);
             driveTrain.setBackLeftPower(PIDpower);
             driveTrain.setBackRightPower(PIDpower);
@@ -168,7 +170,7 @@ public class Decode extends LinearOpMode {
         rampDrive.Reset();
         while (h < targetHeading && opModeIsActive()) {
             double PIDpower = pidRotate.calculate(targetHeading, h);
-            PIDpower = Util.clamp(PIDpower,-1,1);
+            PIDpower = Util.clamp(PIDpower, -1, 1);
             PIDpower = rampDrive.getValue(PIDpower);
             driveTrain.setFrontLeftPower(-PIDpower * mirrorField);
             driveTrain.setFrontRightPower(PIDpower * mirrorField);
@@ -188,31 +190,113 @@ public class Decode extends LinearOpMode {
                 count++;
             }
         }
-            log.d("Target", "Target Reached Heading, Stopping");
-            log.d("", "===========================================");
-            driveTrain.setFrontLeftPower(0);
-            driveTrain.setFrontRightPower(0);
-            driveTrain.setBackLeftPower(0);
-            driveTrain.setBackRightPower(0);
+        log.d("Target", "Target Reached Heading, Stopping");
+        log.d("", "===========================================");
+        driveTrain.setFrontLeftPower(0);
+        driveTrain.setFrontRightPower(0);
+        driveTrain.setBackLeftPower(0);
+        driveTrain.setBackRightPower(0);
 
 
+        telemetry.update();
+        y = imu.getPosY();
+        x = imu.getPosX();
+        log.d("", "End Positions for Shooting:");
+        log.d("X Position", String.valueOf(x));
+        log.d("Y Position", String.valueOf(y));
+        log.d("Heading: ", String.valueOf(h));
+
+        // Shooting
+
+        sleep(1500);
+        shooter.startShooterMotor(0.75);
+        shooter.startShoot();
+        intake.startIntake(0.9);
+        sleep(5000);
+
+
+        shooter.stopShoot();
+        shooter.stopShooterMotor();
+        intake.stopIntake();
+        targetHeading = 359 * mirrorField;
+        while (h < targetHeading && opModeIsActive()) {
+            double PIDpower = pidRotate.calculate(0, h);
+            PIDpower = Util.clamp(PIDpower, -1, 1);
+            PIDpower = rampDrive.getValue(PIDpower);
+            driveTrain.setFrontLeftPower(PIDpower * mirrorField);
+            driveTrain.setFrontRightPower(-PIDpower * mirrorField);
+            driveTrain.setBackLeftPower(PIDpower * mirrorField);
+            driveTrain.setBackRightPower(-PIDpower * mirrorField);
+
+            imu.update();
+            h = imu.getHeading(AngleUnit.DEGREES) * mirrorField;
             telemetry.update();
-            y = imu.getPosY();
+            if (count > 200) {
+                log.d("", "===========================================");
+                log.d("Heading ", String.valueOf(h));
+                log.d("Target", String.valueOf(targetHeading));
+                log.d("", "===========================================");
+                count = 0;
+            } else {
+                count++;
+            }
+        }
+        log.d("Target", "Target Reached Heading, Stopping");
+        log.d("", "===========================================");
+        driveTrain.setFrontLeftPower(0);
+        driveTrain.setFrontRightPower(0);
+        driveTrain.setBackLeftPower(0);
+        driveTrain.setBackRightPower(0);
+
+
+        telemetry.update();
+        y = imu.getPosY();
+        x = imu.getPosX();
+        log.d("X Position", String.valueOf(x));
+        log.d("Y Position", String.valueOf(y));
+        log.d("Heading: ", String.valueOf(h));
+        targetDistance = 0.5;
+        while (x > targetDistance && opModeIsActive()) {
+            double PIDpower = pid.calculate(targetDistance, x);
+            PIDpower = Util.clamp(PIDpower, -1, 1);
+            PIDpower = rampDrive.getValue(PIDpower);
+            driveTrain.setFrontLeftPower(-PIDpower);
+            driveTrain.setFrontRightPower(-PIDpower);
+            driveTrain.setBackLeftPower(-PIDpower);
+            driveTrain.setBackRightPower(-PIDpower);
+
+            imu.update();
             x = imu.getPosX();
-            log.d("", "End Positions:");
-            log.d("X Position", String.valueOf(x));
-            log.d("Y Position", String.valueOf(y));
-            log.d("Heading: ", String.valueOf(h));
+            y = imu.getPosY();
+            telemetry.update();
+            if (count > 200) {
+                log.d("", "===========================================");
+                log.d("X Position", String.valueOf(x));
+                log.d("Y Position", String.valueOf(y));
+                log.d("Target", String.valueOf(targetDistance));
+                log.d("", "===========================================");
+                count = 0;
+            } else {
+                count++;
+            }
+
+        }
+        log.d("Target", "Target Reached, Stopping");
+        log.d("", "===========================================");
+        driveTrain.setFrontLeftPower(0);
+        driveTrain.setFrontRightPower(0);
+        driveTrain.setBackLeftPower(0);
+        driveTrain.setBackRightPower(0);
 
 
-            shooter.startShooterMotor(0.6);
-            sleep(4000);
-            shooter.startShoot();
-            intake.startIntake();
-            sleep(5000);
+        telemetry.update();
+        y = imu.getPosY();
+        x = imu.getPosX();
+        log.d("", "End Positions:");
+        log.d("X Position", String.valueOf(x));
+        log.d("Y Position", String.valueOf(y));
+        log.d("Heading: ", String.valueOf(h));
 
-
-
-
+        }
     }
-}
+
