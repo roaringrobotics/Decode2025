@@ -52,25 +52,20 @@ public class TeleOpDecode extends LinearOpMode {
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         double power;
+        hw.imuPos.resetHeading();
         //  intake = new Intake(hardwareMap);
         waitForStart();
-        float deadZone = 0.75F;
+        float deadZone = 0.5F;
         while (opModeIsActive()) {
+
+            hw.imuPos.update();
+
             double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
             power = powerScaler();
             driveTrain.driveFieldCentric(drive, strafe, rotate, power, hw);
 
-
-            //if (gamepad2.left_trigger > 0.5) {
-            //shooter.startShooterMotor();
-            //}else if (gamepad2.left_trigger < 0.5) {
-            //shooter.stopShooterMotor();
-            //}
-
-            // if last time is was up and this time it's down toggle
-            // if last time it was down and this time it's up toggle
 
             ButtonState currentAButtonState = gamepad2.a ? ButtonState.PRESSED : ButtonState.NOT_PRESSED;
             if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.PRESSED) {
@@ -91,7 +86,7 @@ public class TeleOpDecode extends LinearOpMode {
                     motorRunning = false;
                 }
             }
-            if (gamepad2.b && buttonTimer.seconds() > 0.3) {
+            if (gamepad2.bWasReleased()) {
                 buttonTimer.reset(); // Reset timer to prevent rapid toggling
                 switch (shooterState) {
                     case STOPPED:
@@ -117,12 +112,13 @@ public class TeleOpDecode extends LinearOpMode {
                 shooter.blueServo.setPower(1);
                 shooter.blackServo.setPower(-1);
             }
+
             if (gamepad1.options) {
                 hw.resetImu();
             }
 
 
-            if (gamepad2.right_trigger > 0.5) {
+            if (gamepad2.right_trigger > deadZone) {
                 intake.startIntake(0.75);
             } else {
                 intake.stopIntake();
