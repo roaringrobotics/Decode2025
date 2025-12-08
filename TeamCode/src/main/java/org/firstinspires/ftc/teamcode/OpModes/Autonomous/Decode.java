@@ -49,7 +49,7 @@ public class Decode extends LinearOpMode {
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
         PID pid = new PID(0.85, 0, 0);
-        PID pidRotate = new PID(0.02, 0, 0);
+        PID pidRotate = new PID(0.01, 0, 0);
         PowerRampController rampDrive = new PowerRampController(
                 .2,
                 new SystemTimeSource());
@@ -94,6 +94,14 @@ public class Decode extends LinearOpMode {
             } else {
                 team = "Blue Side";
             }
+            //telemetry.addData("Add Delay, before robot starts?");
+            //if(gamepad2.start){
+                //sleep(5000);
+              //  telemetry.addData("Delay Added")
+            //} else {
+            //    sleep(0);
+            //}
+            
             telemetry.addData("Side", team);
             idle();
         }
@@ -104,6 +112,7 @@ public class Decode extends LinearOpMode {
 
         // Start autonomous
         stateTimer.reset();
+        sleep(5000);
         targetDistance = 52;
 
         telemetry.clearAll();
@@ -113,7 +122,7 @@ public class Decode extends LinearOpMode {
         telemetry.addData("Heading", h);
         telemetry.addData("Target", targetDistance);
 
-        shooter.startShooterMotor(0.67);
+        shooter.startShooterMotor(0.7);
 
         int count = 0;
         while (Math.abs(x) < targetDistance && opModeIsActive()) {
@@ -165,7 +174,8 @@ public class Decode extends LinearOpMode {
 
         // Rotate
         count = 0;
-        double targetHeading = 39;
+
+        double targetHeading = 38;
         rampDrive.Reset();
         while (Math.abs(h) < Math.abs(targetHeading) && opModeIsActive()) {
             double PIDpower = pidRotate.calculate(targetHeading, h);
@@ -208,7 +218,7 @@ public class Decode extends LinearOpMode {
         // Shooting
 
         sleep(1500);
-        shooter.startShooterMotor(0.75);
+        shooter.startShooterMotor(0.77);
         shooter.startShoot();
         intake.startIntake(0.9);
         sleep(5000);

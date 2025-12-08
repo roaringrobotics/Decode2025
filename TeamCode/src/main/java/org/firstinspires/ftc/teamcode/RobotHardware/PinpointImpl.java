@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Interfaces.ImuPositionI;
 
 // ImuPostionWrapper implementation for GoBilda Pinpoint computer.
+
 public class PinpointImpl implements ImuPositionI {
     private final GoBildaPinpointDriver pp;
 
@@ -17,6 +18,7 @@ public class PinpointImpl implements ImuPositionI {
                 GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
         pp.setEncoderResolution(Constants.encoderResolution);
+        pp.setOffsets(140, 177);
     }
 
     @Override

@@ -74,8 +74,6 @@ public class DecodeFromBasket extends LinearOpMode {
         double x = 0;
         double h = 0;
         double targetDistance;
-        double mirrorField = 1;
-        String team = "Blue Side";
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         imu.reset();
@@ -93,7 +91,9 @@ public class DecodeFromBasket extends LinearOpMode {
 
         // Start autonomous
         stateTimer.reset();
-        targetDistance = 40;
+        sleep(5000);
+        //
+        targetDistance = 50;
 
         telemetry.clearAll();
         telemetry.addData("Status", "Started");
@@ -102,7 +102,7 @@ public class DecodeFromBasket extends LinearOpMode {
         telemetry.addData("Heading", h);
         telemetry.addData("Target", targetDistance);
 
-        shooter.startShooterMotor(0.7);
+        shooter.startShooterMotor(0.73);
 
         int count = 0;
         while (Math.abs(x) < targetDistance && opModeIsActive()) {
@@ -110,7 +110,7 @@ public class DecodeFromBasket extends LinearOpMode {
             PIDpower = Util.clamp(PIDpower, -1, 1);
             log.d("", "===========================================");
             log.d("Power1", String.valueOf(PIDpower));
-            PIDpower = rampDrive.getValue(PIDpower);
+            PIDpower = rampDrive.getValue(PIDpower) * 0.5;
             log.d("Power2", String.valueOf(PIDpower));
 
             driveTrain.setFrontLeftPower(-PIDpower);
@@ -118,7 +118,7 @@ public class DecodeFromBasket extends LinearOpMode {
             driveTrain.setBackLeftPower(-PIDpower);
             driveTrain.setBackRightPower(-PIDpower);
 
-            // Update y position from hardware (placeholder logic)
+
             imu.update();
             y = imu.getPosY();
             x = imu.getPosX();
@@ -154,11 +154,27 @@ public class DecodeFromBasket extends LinearOpMode {
 
         // Shooting
 
-        sleep(1500);
-        shooter.startShooterMotor(0.7);
+        sleep(2000);
+        shooter.startShooterMotor(0.8);
         shooter.startShoot();
         intake.startIntake(0.9);
-        sleep(4000);
+//        sleep(1500);
+//        shooter.startShooterMotor(0.75);
+//        intake.stopIntake();
+//        shooter.stopShoot();
+//        sleep(1500);
+//        shooter.startShooterMotor(0.75);
+//        shooter.startShoot();
+//        intake.startIntake(0.9);
+//        sleep(1500);
+//        shooter.startShooterMotor(0.75);
+//        intake.stopIntake();
+//        shooter.stopShoot();
+//        sleep(1500);
+//        shooter.startShooterMotor(0.75);
+//        shooter.startShoot();
+//        intake.startIntake(0.9);
+        sleep(3500);
 
 
         shooter.stopShoot();

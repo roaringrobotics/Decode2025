@@ -104,9 +104,10 @@ public class DecodeShort extends LinearOpMode {
 
         // Start autonomous
         stateTimer.reset();
-        targetDistance = 3;
+        sleep(5000);
+        targetDistance = 4;
 
-        shooter.startShooterMotor(0.75);
+        shooter.startShooterMotor(0.85);
 
         int count = 0;
         while (Math.abs(x) < targetDistance && opModeIsActive()) {
@@ -207,7 +208,7 @@ public class DecodeShort extends LinearOpMode {
             // Shooting
 
             sleep(3000);
-            shooter.startShooterMotor(0.9);
+            shooter.startShooterMotor(0.88);
             shooter.startShoot();
             intake.startIntake(0.8);
             sleep(5000);

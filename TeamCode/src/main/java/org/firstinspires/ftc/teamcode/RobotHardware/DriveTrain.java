@@ -95,12 +95,13 @@ public class DriveTrain {
         getFieldCentricPowerLevels(
                 leftStickY, leftStickX,
                 rightStickX, botHeading);
-        log.d("PathController", "===========================================");
-        log.d("PathController", String.format("fl: %f", fcPowerLevels.frontLeftPower));
-        log.d("PathController", String.format("fr: %f", fcPowerLevels.frontRightPower));
-        log.d("PathController", String.format("bl: %f", fcPowerLevels.backLeftPower));
-        log.d("PathController", String.format("br: %f", fcPowerLevels.backRightPower));
-        log.d("PathController", "===========================================");
+//        log.d("PathController", "===========================================");
+//        log.d("PathController", String.format("fl: %f", fcPowerLevels.frontLeftPower));
+//        log.d("PathController", String.format("fr: %f", fcPowerLevels.frontRightPower));
+//        log.d("PathController", String.format("bl: %f", fcPowerLevels.backLeftPower));
+//        log.d("PathController", String.format("br: %f", fcPowerLevels.backRightPower));
+//        log.d("PathController", "===========================================");
+
         // The power scale has to be negative for two of them because their problematic
         frontLeft.setPower(fcPowerLevels.frontLeftPower * powerScale);
         backLeft.setPower(fcPowerLevels.backLeftPower * -powerScale);
@@ -128,7 +129,7 @@ public class DriveTrain {
 
         // Don't know why the rotated value of left stick x is scale by 1.1.
         // It's not in online example code.
-        // rotatedX = rotatedX * 1.1;
+        rotatedX = rotatedX * 1.1;
 
         // Normalize output power [-1.0-1.0]
         double vectorSum = Math.abs(rotatedY) + Math.abs(rotatedX) + Math.abs(rotate);

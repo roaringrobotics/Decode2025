@@ -67,6 +67,9 @@ public class TeleOpDecode extends LinearOpMode {
             driveTrain.driveFieldCentric(drive, strafe, rotate, power, hw);
 
 
+
+
+
             ButtonState currentAButtonState = gamepad2.a ? ButtonState.PRESSED : ButtonState.NOT_PRESSED;
             if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.PRESSED) {
                 lastAButtonState = currentAButtonState;
