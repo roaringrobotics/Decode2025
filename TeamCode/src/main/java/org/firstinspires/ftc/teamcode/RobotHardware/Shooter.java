@@ -10,6 +10,10 @@ public class Shooter {
     private final DcMotor shooterMotor;
     public final CRServo blueServo;
    public final CRServo blackServo;
+   private double targetVel = 0;
+   private double allowedError = 80;
+   private long settleTimeMs = 120;
+   private long stableSince = 0;
 
 
     public Shooter(HardwareMap hardwareMap) {
@@ -26,7 +30,11 @@ public class Shooter {
         shooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Default run mode (change as needed)
-        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        shooterMotor.s
+
     }
 
     public void setPower(double power) {
