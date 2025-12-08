@@ -1,23 +1,33 @@
 package org.firstinspires.ftc.teamcode.RobotHardware;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import  com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Shooter {
-    private final DcMotor shooterMotor;
+    private final DcMotorEx shooterMotor;
     public final CRServo blueServo;
    public final CRServo blackServo;
-   private double targetVel = 0;
-   private double allowedError = 80;
-   private long settleTimeMs = 120;
-   private long stableSince = 0;
+   private double targetVel = 0;;
+   public static final double P= 16;
+    public static final double I= 0.3;
+    public static final double D= 2.5;
+    public static final double F= 14;
+
+    //Blocker tuning :)
+    private static final double allowedError =50;
+    private static final long settleTimeMs = 90;
+    private long stableSince = 0;
+
+
 
 
     public Shooter(HardwareMap hardwareMap) {
-        shooterMotor = hardwareMap.get(DcMotor.class, "shooter");
+        shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
 
         // Initialize servos (use hardware names configured in your robot config)
         blueServo = hardwareMap.get(CRServo.class, "blueServo");
@@ -27,17 +37,45 @@ public class Shooter {
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Default to BRAKE when power is zero
-        shooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         // Default run mode (change as needed)
-        shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooterMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        shooterMotor.s
+
+
+        shooterMotor.setPIDFCoefficients(
+                DcMotor.RunMode.RUN_USING_ENCODER,
+                new PIDFCoefficients(P,I,D,F)
+        );
 
     }
 
-    public void setPower(double power) {
+    public void setTargetVelocity(double vel){
+        targetVel = vel;
+        shooterMotor.setVelocity(vel);
+    }
+    public boolean isReady(){
+        double current = shooterMotor.getVelocity();
+
+        if(Math.abs(current - targetVel) < allowedError){
+            if(stableSince ==0)
+                stableSince = System.currentTimeMillis();
+            return System.currentTimeMillis() - stableSince > settleTimeMs;
+        } else{
+            stableSince = 0;
+            return false;
+        }
+    }
+
+    public double getVelocity(){
+        return shooterMotor.getVelocity();
+    }
+     public void stop(){
+        setTargetVelocity(0);
+     }
+   /* public void setPower(double power) {
         shooterMotor.setPower(power);
     }
 
@@ -47,15 +85,13 @@ public class Shooter {
     }
     public void stopShooterMotor() {
         setPower(0.0);
-    }
+    }*/
 
-    {
-    }
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
         shooterMotor.setZeroPowerBehavior(behavior);
     }
 
-    public void setRunMode(DcMotor.RunMode mode) {
+    private void setRunMode(DcMotor.RunMode mode) {
         shooterMotor.setMode(mode);
     }
 
