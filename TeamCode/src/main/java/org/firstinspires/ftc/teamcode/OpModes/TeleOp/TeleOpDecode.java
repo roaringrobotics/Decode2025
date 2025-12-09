@@ -57,7 +57,7 @@ public class TeleOpDecode extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
-            driveTrain.driveFieldCentric(drive, strafe, rotate, 0.5, hw);
+            driveTrain.driveFieldCentric(drive, strafe, rotate, 1, hw);
 
 
             //if (gamepad2.left_trigger > 0.5) {
@@ -72,7 +72,7 @@ public class TeleOpDecode extends LinearOpMode {
             ButtonState currentAButtonState = gamepad2.a ? ButtonState.PRESSED : ButtonState.NOT_PRESSED;
             if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.PRESSED) {
                 lastAButtonState = currentAButtonState;
-                shooter.startShooterMotor(0.7);
+                shooter.startShooterMotor(0.5);
             } if (currentAButtonState != lastAButtonState && currentAButtonState == ButtonState.NOT_PRESSED) {
                 lastAButtonState = currentAButtonState;
                 shooter.stopShooterMotor();
@@ -119,7 +119,7 @@ public class TeleOpDecode extends LinearOpMode {
 
 
                 if (gamepad2.right_trigger > 0.5) {
-                    intake.startIntake();
+                    intake.startIntake(1);
                 } else {
                     intake.stopIntake();
                 }

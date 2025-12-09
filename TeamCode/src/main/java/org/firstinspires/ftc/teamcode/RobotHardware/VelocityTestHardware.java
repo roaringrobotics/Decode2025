@@ -15,10 +15,10 @@ public class VelocityTestHardware {
 
     // Target velocity (ticks per second)
     private double targetVel = 0;
-    private static final double P = 16.0;
+    private static final double P = 20;
     private static final double I = 0.3;
     private static final double D = 2.5;
-    private static final double F = 14.0;
+    private static final double F = 10.2;
 
     // Velocity blocker settings
     private static final double allowedError = 50;  // TPS

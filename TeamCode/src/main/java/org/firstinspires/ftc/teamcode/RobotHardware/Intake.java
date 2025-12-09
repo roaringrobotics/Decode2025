@@ -48,8 +48,8 @@ public class Intake {
         motor.setMode(mode);
     }
 
-    public void startIntake() {
-        setPower(-0.75);
+    public void startIntake(double power) {
+        setPower(-power);
     }
     public void stopIntake() {
         setPower(0.0);
