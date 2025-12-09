@@ -12,17 +12,6 @@ public class Shooter {
     private final DcMotorEx shooterMotor;
     public final CRServo blueServo;
    public final CRServo blackServo;
-   private double targetVel = 0;;
-   public static final double P= 16;
-    public static final double I= 0.3;
-    public static final double D= 2.5;
-    public static final double F= 14;
-
-    //Blocker tuning :)
-    private static final double allowedError =50;
-    private static final long settleTimeMs = 90;
-    private long stableSince = 0;
-
 
 
 
@@ -40,52 +29,23 @@ public class Shooter {
         shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         // Default run mode (change as needed)
-        shooterMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-
-
-        shooterMotor.setPIDFCoefficients(
-                DcMotor.RunMode.RUN_USING_ENCODER,
-                new PIDFCoefficients(P,I,D,F)
-        );
 
     }
 
-    public void setTargetVelocity(double vel){
-        targetVel = vel;
-        shooterMotor.setVelocity(vel);
-    }
-    public boolean isReady(){
-        double current = shooterMotor.getVelocity();
 
-        if(Math.abs(current - targetVel) < allowedError){
-            if(stableSince ==0)
-                stableSince = System.currentTimeMillis();
-            return System.currentTimeMillis() - stableSince > settleTimeMs;
-        } else{
-            stableSince = 0;
-            return false;
-        }
-    }
 
-    public double getVelocity(){
-        return shooterMotor.getVelocity();
-    }
-     public void stop(){
-        setTargetVelocity(0);
-     }
-   /* public void setPower(double power) {
+    public void setPower(double power) {
         shooterMotor.setPower(power);
     }
 
     public void startShooterMotor(double power) {
-        setPower(power);
+        setPower(1);
 
     }
     public void stopShooterMotor() {
         setPower(0.0);
-    }*/
+    }
 
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
         shooterMotor.setZeroPowerBehavior(behavior);
@@ -101,9 +61,8 @@ public class Shooter {
         blackServo.setPower(0);
     }
      public void startShoot() {
-        double power = 1.0;
-        blueServo.setPower(-power);
-        blackServo.setPower(power);
+        blueServo.setPower(-1);
+        blackServo.setPower(1);
      }
     //public void toggleShootMotor() {
         //if (shooterMotor.getPower() == 0.0) {
