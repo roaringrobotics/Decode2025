@@ -133,13 +133,13 @@ public class DriveTrain {
 
         // Normalize output power [-1.0-1.0]
         double vectorSum = Math.abs(rotatedY) + Math.abs(rotatedX) + Math.abs(rotate);
-        double normalize = Math.max(vectorSum, 1.0);
+        double denom = Math.max(vectorSum, 1.0);
 
         // Set normalized field centric power levels.
-        fcPowerLevels.frontLeftPower = -(rotatedY + rotatedX - rotate) * normalize;
-        fcPowerLevels.backLeftPower = (rotatedY - rotatedX - rotate) * normalize;
-        fcPowerLevels.frontRightPower = (rotatedY - rotatedX + rotate) * normalize;
-        fcPowerLevels.backRightPower = -(rotatedY + rotatedX + rotate) * normalize;
+        fcPowerLevels.frontLeftPower = -(rotatedY + rotatedX - rotate) / denom;
+        fcPowerLevels.backLeftPower = (rotatedY - rotatedX - rotate) / denom;
+        fcPowerLevels.frontRightPower = (rotatedY - rotatedX + rotate) / denom;
+        fcPowerLevels.backRightPower = -(rotatedY + rotatedX + rotate) / denom;
     }
 
     // Class to hold field centric power level output from getFieldCentricPowerLevels

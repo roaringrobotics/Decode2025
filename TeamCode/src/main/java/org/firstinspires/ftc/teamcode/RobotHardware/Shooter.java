@@ -40,7 +40,7 @@ public class Shooter {
     }
 
     public void startShooterMotor(double power) {
-        setPower(1);
+        setPower(0.5);
 
     }
     public void stopShooterMotor() {
