@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.RobotHardware;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import  com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,9 +9,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Shooter {
     private final DcMotorEx shooterMotor;
     public final CRServo blueServo;
-   public final CRServo blackServo;
-
-
+    public final CRServo blackServo;
+    public long lastTime;
+    public double lastVelocity;
 
     public Shooter(HardwareMap hardwareMap) {
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
@@ -27,13 +25,13 @@ public class Shooter {
 
         // Default to BRAKE when power is zero
         shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-        // Default run mode (change as needed)
-
-
     }
 
-
+    public void updateKinematics(long currentTime)
+    {
+        lastTime = currentTime;
+        lastVelocity = shooterMotor.getVelocity();
+    }
 
     public void setPower(double power) {
         shooterMotor.setPower(power);
@@ -64,6 +62,26 @@ public class Shooter {
         blueServo.setPower(-1);
         blackServo.setPower(1);
      }
+
+    public void toggleShooterMotor(boolean toggle) {
+        if(toggle)
+        {
+          if(shooterMotor.getPower() != 0 )  // motor running
+              stopShooterMotor();
+          else
+              startShooterMotor(0.5);
+        }
+    }
+
+    public void toggleShooterFeeders(boolean toggle) {
+        if(toggle)
+        {
+            if(blueServo.getPower() != 0 ) // feeders running
+                stopShoot();
+            else
+                startShoot();
+        }
+    }
     //public void toggleShootMotor() {
         //if (shooterMotor.getPower() == 0.0) {
           //  startShooterMotor();
