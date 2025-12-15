@@ -38,8 +38,7 @@ public class Shooter {
     }
 
     public void startShooterMotor(double power) {
-        setPower(0.5);
-
+        setPower(power);
     }
     public void stopShooterMotor() {
         setPower(0.0);
@@ -63,13 +62,40 @@ public class Shooter {
         blackServo.setPower(1);
      }
 
-    public void toggleShooterMotor(boolean toggle) {
+    public void toggleShooterMotor65(boolean toggle) {
         if(toggle)
         {
           if(shooterMotor.getPower() != 0 )  // motor running
               stopShooterMotor();
           else
-              startShooterMotor(0.5);
+              startShooterMotor(0.65);
+        }
+    }
+    public void toggleShooterMotor60(boolean toggle) {
+        if(toggle)
+        {
+            if(shooterMotor.getPower() != 0 )  // motor running
+                stopShooterMotor();
+            else
+                startShooterMotor(0.6);
+        }
+    }
+    public void toggleShooterMotor55(boolean toggle) {
+        if(toggle)
+        {
+            if(shooterMotor.getPower() != 0 )  // motor running
+                stopShooterMotor();
+            else
+                startShooterMotor(0.55);
+        }
+    }
+    public void toggleShooterMotor50(boolean toggle) {
+        if(toggle)
+        {
+            if(shooterMotor.getPower() != 0 )  // motor running
+                stopShooterMotor();
+            else
+                startShooterMotor(0.5);
         }
     }
 
@@ -88,4 +114,8 @@ public class Shooter {
         //} else {
           //  stopShooterMotor();
         //}
+    public void getShooterVelocity() {
+        shooterMotor.getVelocity();
     }
+    }
+

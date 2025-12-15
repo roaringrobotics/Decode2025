@@ -49,8 +49,11 @@ public class TeleOpDecode extends LinearOpMode {
             long currentTime = timesource.currentTimeMillis();
             shooter.updateKinematics(currentTime);
 
-            shooter.toggleShooterMotor(gamepad2.aWasPressed());
-            shooter.toggleShooterFeeders(gamepad2.bWasPressed());
+            shooter.toggleShooterMotor65(gamepad2.aWasPressed());
+            shooter.toggleShooterMotor60(gamepad2.bWasPressed());
+            shooter.toggleShooterMotor55(gamepad2.yWasPressed());
+            shooter.toggleShooterMotor50(gamepad2.xWasPressed());
+            //shooter.toggleShooterFeeders(gamepad2.aWasPressed());
 
             if (gamepad2.dpad_right) {
                 shooter.blueServo.setPower(-1);
