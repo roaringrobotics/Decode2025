@@ -16,7 +16,8 @@ public class Shooter {
     public long lastTime;
     public double lastVelocity;
     //private double[] velocityBuffer = {(1430*Math.PI), (1573*Math.PI), (1716*Math.PI)};
-    private double[] velocityBuffer = {(1300), (2000), (3000)};
+    private double[] velocityBuffer = {(1600), (1700), (1800)};
+    private double allowedError = 50.0;
     private Intake intake;
     public AndroidLog log;
 
@@ -169,15 +170,16 @@ public class Shooter {
                 startShooterMotor(targetVelocity);
                 ShooterState = ShooterState.SPINNING_UP;
             }
-            else if (ShooterState == ShooterState.SPINNING_UP && currentVel < targetVelocity) {
+            else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) > allowedError) {
                 startShooterMotor(targetVelocity);
                //
             }
-            else if (ShooterState == ShooterState.SPINNING_UP && currentVel >= targetVelocity) {
+            else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
                 startShoot();
                 intake.startIntake(1.0);
                 ShooterState = ShooterState.SHOOTING;
-            } else if (ShooterState == ShooterState.SHOOTING && currentVel <= targetVelocity) {
+            } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
+                startShooterMotor(targetVelocity);
                 stopShoot();
                 ShooterState = ShooterState.SPINNING_UP;
             }
