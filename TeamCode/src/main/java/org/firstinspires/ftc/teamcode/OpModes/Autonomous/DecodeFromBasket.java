@@ -45,8 +45,8 @@ public class DecodeFromBasket extends LinearOpMode {
     public void runOpMode() {
         driveTrain = new DriveTrain(hardwareMap);
         imu = new PinpointImpl(hardwareMap);
-        shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
+        shooter = new Shooter(hardwareMap, intake, log);
         PID pid = new PID(0.8, 0, 0);
         PID pidRotate = new PID(0.02, 0, 0);
         PowerRampController rampDrive = new PowerRampController(

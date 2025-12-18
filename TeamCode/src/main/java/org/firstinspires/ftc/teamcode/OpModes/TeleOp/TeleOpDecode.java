@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
 import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
@@ -19,6 +20,7 @@ public class TeleOpDecode extends LinearOpMode {
     private Hardware hw;
     private Intake intake;
     private SystemTimeSource timesource = new SystemTimeSource();
+    private final AndroidLog log = new AndroidLog();
 
     // private Intake intake;
     private ButtonState lastAButtonState = ButtonState.NOT_PRESSED;
@@ -34,8 +36,8 @@ public class TeleOpDecode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         driveTrain = new DriveTrain(hardwareMap);
         hw = new Hardware(hardwareMap);
-        shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
+        shooter = new Shooter(hardwareMap, intake, log);
         //  intake = new Intake(hardwareMap);
         waitForStart();
         float deadZone = 0.75F;
@@ -46,43 +48,21 @@ public class TeleOpDecode extends LinearOpMode {
             driveTrain.driveFieldCentric(drive, strafe, rotate, 1, hw);
 
             timesource.update();
-            long currentTime = timesource.currentTimeMillis();
-            shooter.updateKinematics(currentTime);
 
-            shooter.toggleShooterMotor65(gamepad2.aWasPressed());
-            shooter.toggleShooterMotor60(gamepad2.bWasPressed());
-            shooter.toggleShooterMotor55(gamepad2.yWasPressed());
-            shooter.toggleShooterMotor50(gamepad2.xWasPressed());
-            //shooter.toggleShooterFeeders(gamepad2.aWasPressed());
+            shooter.continousShoot(gamepad2.a, gamepad2.b, gamepad2.y);
 
-            if (gamepad2.dpad_right) {
-                shooter.blueServo.setPower(-1);
-                shooter.blackServo.setPower(1);
-            } else {
-                shooter.blueServo.setPower(0);
-                shooter.blackServo.setPower(0);
-            } if (gamepad2.dpad_left){
-                shooter.blueServo.setPower(1);
-                shooter.blackServo.setPower(-1);
+            if(!gamepad2.a && !gamepad2.b && !gamepad2.y) {
+
+                if (gamepad2.right_trigger > 0.5) {
+                    shooter.startIntake();
+                } else {
+                    shooter.stopIntake();
+                }
+                if (gamepad2.left_trigger > 0.5) {
+                    shooter.reverseIntake();
+                }
             }
-            if (gamepad1.options) {
-                hw.resetImu();
-            }
-
-            if (gamepad2.right_trigger > 0.5) {
-                intake.startIntake(1);
-            } else {
-                intake.stopIntake();
-            }
-            if (gamepad2.left_trigger > 0.5){
-                intake.reverseIntake();
-            }
-
-            }
-
-
-            // Class to hold field centric power level output from getFieldCentricPowerLevels
-
         }
     }
+}
 
