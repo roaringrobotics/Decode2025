@@ -22,6 +22,8 @@ public class Shooter {
     public AndroidLog log;
 
 
+    int ballsLaunched = 0;
+    boolean empty = false;
 
     enum ShooterState {
         IDLE,
@@ -29,12 +31,15 @@ public class Shooter {
         SHOOTING
     }
     private ShooterState ShooterState;
+    private ShooterState lastShooterState;
 
     public Shooter(HardwareMap hardwareMap, Intake in, AndroidLog logIn) {
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
         intake = in;
         ShooterState = ShooterState.IDLE;
         log = logIn;
+
+
 
         // Initialize servos (use hardware names configured in your robot config)
         blueServo = hardwareMap.get(CRServo.class, "blueServo");
@@ -140,7 +145,6 @@ public class Shooter {
     }
 
     public void continousShoot(boolean buttonShort, boolean buttonMid, boolean buttonLong) {
-        //
         boolean allOff = !buttonShort && !buttonMid && !buttonLong;
         boolean anyOn = buttonShort || buttonMid || buttonLong;
 
@@ -153,11 +157,21 @@ public class Shooter {
             targetVelocity = velocityBuffer[2];
         }
 
-        if (allOff) {
+        if (allOff || ballsLaunched == 3 && !empty) {
+            if (allOff) {
+                ballsLaunched = 0;
+                // eventually we will add logic to detect if there are balls in the shooter
+                empty = false;
+            } else {
+                empty = true;
+
+            }
+
             stopShooterMotor();
             stopShoot();
             intake.stopIntake();
             ShooterState = ShooterState.IDLE;
+
         } else if (anyOn) {
             double currentVel = shooterMotor.getVelocity();
             double currentVelDeg = shooterMotor.getVelocity(AngleUnit.DEGREES);
@@ -166,22 +180,32 @@ public class Shooter {
             log.d("Shooter", "Velocity (deg): " + currentVelDeg);
             log.d("Shooter", "Target Velocity: " + targetVelocity);
             log.d("Shooter", "State: " + ShooterState.toString());
+            log.d("Shooter", "Balls Launched: " + ballsLaunched);
             if(ShooterState == ShooterState.IDLE) {
                 startShooterMotor(targetVelocity);
                 ShooterState = ShooterState.SPINNING_UP;
             }
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) > allowedError) {
+                if (lastShooterState == ShooterState.SHOOTING) {
+                    ballsLaunched++;
+                    lastShooterState = ShooterState.SPINNING_UP;
+                }
+
                 startShooterMotor(targetVelocity);
                //
             }
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
+                ShooterState = ShooterState.SHOOTING;
                 startShoot();
                 intake.startIntake(1.0);
-                ShooterState = ShooterState.SHOOTING;
             } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
                 startShooterMotor(targetVelocity);
                 stopShoot();
+                lastShooterState = ShooterState.SHOOTING;
                 ShooterState = ShooterState.SPINNING_UP;
+
+
+
             }
         }
     }

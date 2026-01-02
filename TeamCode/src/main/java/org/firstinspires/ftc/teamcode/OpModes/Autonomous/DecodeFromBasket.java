@@ -155,25 +155,8 @@ public class DecodeFromBasket extends LinearOpMode {
         // Shooting
 
         sleep(2000);
-        shooter.startShooterMotor(0.8);
-        shooter.startShoot();
-        intake.startIntake(0.9);
-//        sleep(1500);
-//        shooter.startShooterMotor(0.75);
-//        intake.stopIntake();
-//        shooter.stopShoot();
-//        sleep(1500);
-//        shooter.startShooterMotor(0.75);
-//        shooter.startShoot();
-//        intake.startIntake(0.9);
-//        sleep(1500);
-//        shooter.startShooterMotor(0.75);
-//        intake.stopIntake();
-//        shooter.stopShoot();
-//        sleep(1500);
-//        shooter.startShooterMotor(0.75);
-//        shooter.startShoot();
-//        intake.startIntake(0.9);
+        shooter.continousShoot(true, false, false);
+
         sleep(3500);
 
 
