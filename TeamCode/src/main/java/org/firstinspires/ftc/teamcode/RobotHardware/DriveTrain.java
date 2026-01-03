@@ -270,5 +270,86 @@ public class DriveTrain {
         stopMotors();
     }
 
+    /**
+     * Rotates the robot in place by a relative angle (positive = clockwise, negative = counterclockwise).
+     * Uses PID control for smooth and accurate turns.
+     *
+     * @param relativeAngleDeg The angle to rotate relative to current heading (e.g., +90 for 90° right)
+     * @param imu              IMU interface for getting current heading
+     * @param log              Logger for debugging (optional, can be null if not needed)
+     * @throws Exception
+     */
+    public void rotateRelative(double relativeAngleDeg, ImuPositionI imu, LogI log) throws Exception {
+        imu.update();
+        double currentHeading = imu.getHeading(AngleUnit.DEGREES);
 
+        // Calculate absolute target heading
+        double targetHeading = currentHeading + relativeAngleDeg;
+
+        // Normalize target to [-180, 180] or [0, 360] — here we keep it continuous but normalize error later
+        // No need to normalize target itself, only the error
+
+        PID pid = new PID(0.012, 0.0001, 0.001); // Tune these: Kp, Ki, Kd
+        double minPower = 0.18;       // Minimum power to overcome friction — adjust based on your robot
+        double toleranceDeg = 2.0;    // Consider "on target" if within this
+        int settleCountsRequired = 15; // Must stay within tolerance for ~15 loops (~300ms at 20ms loop)
+        int settleCount = 0;
+
+        while (true) {
+            imu.update();
+            currentHeading = imu.getHeading(AngleUnit.DEGREES);
+
+            // Calculate error with shortest path (-180 to +180)
+            double error = targetHeading - currentHeading;
+            while (error > 180) error -= 360;
+            while (error <= -180) error += 360;
+
+            // Exit condition: small error and settled
+            if (Math.abs(error) <= toleranceDeg) {
+                settleCount++;
+                if (settleCount >= settleCountsRequired) {
+                    break;
+                }
+            } else {
+                settleCount = 0;
+            }
+
+            // PID calculation — assuming your PID.calculate(setpoint, current) returns correction
+            // Many FTC PID classes use calculate(target, current), so:
+            double power = pid.calculate(targetHeading, currentHeading);
+
+            // Alternative: if your PID expects error directly or setpoint=0:
+            // double power = pid.calculate(0, error);
+
+            // Apply minimum power when needed (preserve direction)
+            if (Math.abs(power) < minPower && Math.abs(error) > toleranceDeg) {
+                power = minPower * Math.signum(power);
+            }
+
+            // Clamp power to motor limits
+            power = Math.max(-1.0, Math.min(1.0, power));
+
+            // Apply tank turn: positive power = clockwise rotation (common convention)
+            setFrontLeftPower(-power);
+            setBackLeftPower(-power);
+            setFrontRightPower(power);
+            setBackRightPower(power);
+
+            // Optional logging
+            if (log != null) {
+                log.d("RotateRel", "Target: " + String.format("%.1f", targetHeading) +
+                        " | Current: " + String.format("%.1f", currentHeading) +
+                        " | Error: " + String.format("%.1f", error) +
+                        " | Power: " + String.format("%.3f", power));
+            }
+
+            sleep(20); // 50 Hz loop — stable and efficient
+        }
+
+        stopMotors();
+
+        if (log != null) {
+            log.d("RotateRel", "Rotation complete. Final heading: " + currentHeading);
+        }
+    }
 }
