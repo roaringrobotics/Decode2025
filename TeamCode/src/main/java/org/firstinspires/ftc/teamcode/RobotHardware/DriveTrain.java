@@ -218,41 +218,53 @@ public class DriveTrain {
         stopMotors();
     }
 
-    public void rotate(double targetAngleDeg, double power, ImuPositionI imu, LogI log) throws Exception {
+    public void rotate(double targetAngleDeg, ImuPositionI imu, LogI log) throws Exception {
         imu.update();
         double heading = imu.getHeading(AngleUnit.DEGREES);
 
         double error = targetAngleDeg - heading;
-        // normalize error to [-180, 180]
         while (error > 180) error -= 360;
         while (error <= -180) error += 360;
-        PID pidRotate = new PID(0.09, 0, 0);
-        while (Math.abs(error) > 10) {
-            power = pidRotate.calculate(targetAngleDeg, heading);
+
+        PID pidRotate = new PID(0.012, 0.0001, 0.001); // Example tuned values: adjust Kp/Ki/Kd based on testing
+        double minPower = 0.18; // Minimum power to overcome friction (tune this!)
+        int onTargetCount = 0;
+        int requiredCounts = 10; // Must be on-target for ~10 loops
+
+        while (Math.abs(error) > 2 || onTargetCount < requiredCounts) { // Coarse + settle
+            double power = pidRotate.calculate(0, error); // Many PID impls use calculate(setpoint=0, processVar=error)
+            // Or if yours is calculate(target, current): pidRotate.calculate(targetAngleDeg, heading)
+
+            // Apply min power (preserve sign)
+            if (Math.abs(power) < minPower && Math.abs(error) > 2) {
+                power = minPower * Math.signum(power);
+            }
+
+            // Clamp
+            power = Math.max(-1.0, Math.min(1.0, power));
+
+            // Tank rotate in place (assuming standard FTC config: +power = clockwise turn)
+            setFrontLeftPower(-power);
+            setBackLeftPower(-power);
+            setFrontRightPower(power);
+            setBackRightPower(power);
+
             log.d("heading", String.valueOf(heading));
+            log.d("error", String.valueOf(error));
             log.d("power", String.valueOf(power));
             log.d("", "----------------------------");
-            if (error > 0) {
-                setFrontLeftPower(-power);
-                setBackLeftPower(-power);
-                setFrontRightPower(power);
-                setBackRightPower(power);
-            } else {
-                setFrontLeftPower(power);
-                setBackLeftPower(power);
-                setFrontRightPower(-power);
-                setBackRightPower(-power);
-            }
 
             imu.update();
             heading = imu.getHeading(AngleUnit.DEGREES);
 
             error = targetAngleDeg - heading;
-            // normalize error to [-180, 180]
             while (error > 180) error -= 360;
             while (error <= -180) error += 360;
 
-            sleep(1);
+            if (Math.abs(error) < 2) onTargetCount++;
+            else onTargetCount = 0;
+
+            sleep(20); // Slower loop for stability
         }
 
         stopMotors();
