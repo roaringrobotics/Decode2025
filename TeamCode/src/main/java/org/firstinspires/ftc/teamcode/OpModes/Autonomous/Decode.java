@@ -219,15 +219,18 @@ public class Decode extends LinearOpMode {
         log.d("Heading: ", String.valueOf(h));
 
         // Shooting
-
-        while (shooter.getBallsLaunched() < 3) {
+        stateTimer.reset();
+        while (shooter.getBallsLaunched() < 3 && stateTimer.milliseconds() < 5000) {
             shooter.continousShoot(true, false, false);
             sleep(5);
         }
+        shooter.stopShooterMotor();
+        shooter.stopIntake();
+        shooter.stopShoot();
 
         try {
-            driveTrain.rotate(90, .2, imu, log);
-            driveTrain.driveStraight(6, .5, imu, log);
+            driveTrain.rotate(-90, .2, imu, log);
+            driveTrain.driveStraight(24, -0.5, imu, log);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
