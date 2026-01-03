@@ -125,6 +125,7 @@ public class Decode extends LinearOpMode {
         shooter.startShooterMotor(0.7);
 
         int count = 0;
+        double startHeading = imu.getHeading(AngleUnit.DEGREES);
         while (Math.abs(x) < targetDistance && opModeIsActive()) {
             double PIDpower = pid.calculate(targetDistance, x);
             PIDpower = Util.clamp(PIDpower, -1, 1);
@@ -137,6 +138,8 @@ public class Decode extends LinearOpMode {
             driveTrain.setFrontRightPower(PIDpower);
             driveTrain.setBackLeftPower(PIDpower);
             driveTrain.setBackRightPower(PIDpower);
+
+            driveTrain.followHeading(imu, startHeading, PIDpower, 0.03, 2);
 
             // Update y position from hardware (placeholder logic)
             imu.update();

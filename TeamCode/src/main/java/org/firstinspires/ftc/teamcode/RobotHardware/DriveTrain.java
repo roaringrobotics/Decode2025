@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Interfaces.LogI;
+import org.firstinspires.ftc.teamcode.Interfaces.ImuPositionI;
 
 public class DriveTrain {
     public DcMotor frontRight;
@@ -74,6 +75,43 @@ public class DriveTrain {
         setFrontRightPower(0);
         setBackLeftPower(0);
         setBackRightPower(0);
+    }
+
+    /**
+     * Adjusts motor powers to follow a target heading. Call repeatedly from a loop.
+     * @param imu IMU implementation providing heading (degrees)
+     * @param targetAngleDeg target heading in degrees
+     * @param maxPower maximum absolute motor power (0..1)
+     * @param kP proportional gain applied to heading error
+     * @param toleranceDeg if absolute error is within this, motors are stopped
+     */
+    public void followHeading(ImuPositionI imu,
+                              double targetAngleDeg,
+                              double maxPower,
+                              double kP,
+                              double toleranceDeg) {
+        imu.update();
+        double heading = imu.getHeading(AngleUnit.DEGREES);
+
+        double error = targetAngleDeg - heading;
+        // normalize error to [-180, 180]
+        while (error > 180) error -= 360;
+        while (error <= -180) error += 360;
+
+        if (Math.abs(error) <= toleranceDeg) {
+            stopMotors();
+            return;
+        }
+
+        double turn = kP * error;
+        if (turn > maxPower) turn = maxPower;
+        if (turn < -maxPower) turn = -maxPower;
+
+        // Apply turn power: left motors positive, right motors negative (matches driveFieldCentric convention)
+        frontLeft.setPower(turn);
+        backLeft.setPower(turn);
+        frontRight.setPower(-turn);
+        backRight.setPower(-turn);
     }
     private static class FieldCentricPowerLevels {
         public double frontLeftPower;
