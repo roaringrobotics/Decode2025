@@ -54,6 +54,17 @@ public class Vector2 {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    // java
+    public static double distanceBetweenPoses(Pose2D a, Pose2D b) {
+        if (a == null || b == null) return Double.NaN;
+        double ax = a.getX(DistanceUnit.INCH);
+        double ay = a.getY(DistanceUnit.INCH);
+        double bx = b.getX(DistanceUnit.INCH);
+        double by = b.getY(DistanceUnit.INCH);
+        return Math.hypot(ax - bx, ay - by);
+    }
+
+
     public void normalize()
     {
         // normalize to unit vector.
@@ -89,4 +100,6 @@ public class Vector2 {
     public String toString() {
         return "[" + x + ", " + y + "]";
     }
+
+
 }

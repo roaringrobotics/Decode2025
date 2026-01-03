@@ -139,7 +139,7 @@ public class Decode extends LinearOpMode {
             driveTrain.setBackLeftPower(PIDpower);
             driveTrain.setBackRightPower(PIDpower);
 
-            driveTrain.followHeading(imu, startHeading, PIDpower, 0.03, 2);
+           // driveTrain.followHeading(imu, startHeading, PIDpower, 0.03, 2);
 
             // Update y position from hardware (placeholder logic)
             imu.update();
@@ -220,13 +220,17 @@ public class Decode extends LinearOpMode {
 
         // Shooting
 
-        sleep(1500);
-        shooter.startShooterMotor(0.77);
-        shooter.startShoot();
-        intake.startIntake(0.9);
-        sleep(5000);
+        while (shooter.getBallsLaunched() < 3) {
+            shooter.continousShoot(true, false, false);
+            sleep(5);
+        }
 
-
+        try {
+            driveTrain.rotate(90, .2, imu, log);
+            driveTrain.driveStraight(6, .5, imu, log);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         shooter.stopShoot();
         shooter.stopShooterMotor();
         intake.stopIntake();

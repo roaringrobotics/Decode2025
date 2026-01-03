@@ -1,13 +1,19 @@
 package org.firstinspires.ftc.teamcode.RobotHardware;
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Interfaces.LogI;
 import org.firstinspires.ftc.teamcode.Interfaces.ImuPositionI;
+import org.firstinspires.ftc.teamcode.Math.Vector2;
+import org.firstinspires.ftc.teamcode.Pathing.PID;
 
 public class DriveTrain {
     public DcMotor frontRight;
@@ -37,20 +43,28 @@ public class DriveTrain {
     }
 
     public void setFrontLeftPower(double power) {
+        power = Math.min(power, 1.0);
+        power = Math.max(power, -1.0);
         frontLeft.setPower(power);
     }
 
     public void setFrontRightPower(double power) {
+        power = Math.min(power, 1.0);
+        power = Math.max(power, -1.0);
         frontRight.setPower(power);
 
     }
 
     public void setBackLeftPower(double power) {
+        power = Math.min(power, 1.0);
+        power = Math.max(power, -1.0);
         backLeft.setPower(power);
 
     }
 
     public void setBackRightPower(double power) {
+        power = Math.min(power, 1.0);
+        power = Math.max(power, -1.0);
         backRight.setPower(power);
     }
 
@@ -181,5 +195,68 @@ public class DriveTrain {
     }
 
     // Class to hold field centric power level output from getFieldCentricPowerLevels
+    public void driveStraight(double distance, double power, ImuPositionI imu, LogI log) throws Exception {
+        imu.update();
+        Pose2D startPose = imu.getPose();
+        double delta = distance;
+        do {
+
+            setFrontRightPower(power);
+            setFrontLeftPower(power);
+            setBackRightPower(power);
+            setBackLeftPower(power);
+
+            sleep(1);
+            imu.update();
+            Pose2D curPose = imu.getPose();
+
+            delta = Vector2.distanceBetweenPoses(startPose, curPose);
+
+             log.d("DriveStraight", String.format("Delta: %f", delta));
+        } while(delta < Math.abs(distance));
+
+        stopMotors();
+    }
+
+    public void rotate(double targetAngleDeg, double power, ImuPositionI imu, LogI log) throws Exception {
+        imu.update();
+        double heading = imu.getHeading(AngleUnit.DEGREES);
+
+        double error = targetAngleDeg - heading;
+        // normalize error to [-180, 180]
+        while (error > 180) error -= 360;
+        while (error <= -180) error += 360;
+        PID pidRotate = new PID(0.09, 0, 0);
+        while (Math.abs(error) > 10) {
+            power = pidRotate.calculate(targetAngleDeg, heading);
+            log.d("heading", String.valueOf(heading));
+            log.d("power", String.valueOf(power));
+            log.d("", "----------------------------");
+            if (error > 0) {
+                setFrontLeftPower(-power);
+                setBackLeftPower(-power);
+                setFrontRightPower(power);
+                setBackRightPower(power);
+            } else {
+                setFrontLeftPower(power);
+                setBackLeftPower(power);
+                setFrontRightPower(-power);
+                setBackRightPower(-power);
+            }
+
+            imu.update();
+            heading = imu.getHeading(AngleUnit.DEGREES);
+
+            error = targetAngleDeg - heading;
+            // normalize error to [-180, 180]
+            while (error > 180) error -= 360;
+            while (error <= -180) error += 360;
+
+            sleep(1);
+        }
+
+        stopMotors();
+    }
+
 
 }

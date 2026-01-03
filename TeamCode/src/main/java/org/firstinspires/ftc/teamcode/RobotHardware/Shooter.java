@@ -224,5 +224,8 @@ public class Shooter {
         if(ShooterState == ShooterState.IDLE)
             intake.startIntake(-1.0);
     }
+    public int getBallsLaunched() {
+        return ballsLaunched;
+    }
 }
 
