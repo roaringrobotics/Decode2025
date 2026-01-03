@@ -109,7 +109,6 @@ public class Decode extends LinearOpMode {
         if (isStopRequested()) {
             return;
         }
-
         // Start autonomous
         stateTimer.reset();
         sleep(5000);
@@ -224,18 +223,20 @@ public class Decode extends LinearOpMode {
             shooter.continousShoot(true, false, false);
             sleep(5);
         }
+        shooter.stopShoot();
         shooter.stopShooterMotor();
         shooter.stopIntake();
-        shooter.stopShoot();
+        intake.stopIntake();
 
         try {
-            driveTrain.rotate(-90, .2, imu, log);
+            driveTrain.rotate(90, 0.4, imu, log);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
             driveTrain.driveStraight(24, -0.5, imu, log);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        shooter.stopShoot();
-        shooter.stopShooterMotor();
-        intake.stopIntake();
     }
 }

@@ -218,17 +218,57 @@ public class DriveTrain {
         stopMotors();
     }
 
-    public void rotate(double targetAngleDeg, double power, ImuPositionI imu, LogI log) throws Exception {
+    public void rotate(double deltaAngle, double maxPower, ImuPositionI imu, LogI log) throws Exception {
         imu.update();
         double heading = imu.getHeading(AngleUnit.DEGREES);
+        double startHeading = heading;
+        double sign = 1;
+
+        PID pidRotate = new PID(0.065, 0, 0);
+        if (deltaAngle < 0) {;
+            sign = -1;
+        }
+        deltaAngle = Math.abs(deltaAngle);
+        double deltaHeading = Math.abs(heading) - startHeading;
+
+        while (deltaAngle > deltaHeading) {
+            double power = clamp(pidRotate.calculate(deltaAngle, Math.abs(heading)), -maxPower, maxPower) * sign;
+
+
+            log.d("turning", "Delta Angle: " + deltaAngle);
+            log.d("turning", "Heading: " + heading);
+            log.d("turning", "Delta Heading: " + deltaHeading);
+            log.d("turning", "power: " + power);
+
+            setFrontLeftPower(power);
+            setBackLeftPower(power);
+            setFrontRightPower(-power);
+            setBackRightPower(-power);
+
+            imu.update();
+            heading = imu.getHeading(AngleUnit.DEGREES);
+            deltaHeading = Math.abs(heading) - startHeading;
+        }
+        log.d("turning", "Final Position");
+        log.d("turning", "Delta Angle: " + deltaAngle);
+        log.d("turning", "Heading: " + heading);
+        log.d("turning", "Delta Heading: " + deltaHeading);
+
+
+    }
+
+    public void rotate2(double targetAngleDeg, double maxPower, ImuPositionI imu, LogI log) throws Exception {
+        imu.update();
+        double heading = imu.getHeading(AngleUnit.DEGREES);
+        double startHeading = heading;
 
         double error = targetAngleDeg - heading;
         // normalize error to [-180, 180]
         while (error > 180) error -= 360;
         while (error <= -180) error += 360;
-        PID pidRotate = new PID(0.09, 0, 0);
+        PID pidRotate = new PID(0.09, 0.01, 0);
         while (Math.abs(error) > 10) {
-            power = pidRotate.calculate(targetAngleDeg, heading);
+            double power = clamp(pidRotate.calculate(targetAngleDeg, heading), -maxPower, maxPower);
             log.d("heading", String.valueOf(heading));
             log.d("power", String.valueOf(power));
             log.d("", "----------------------------");
@@ -256,6 +296,10 @@ public class DriveTrain {
         }
 
         stopMotors();
+    }
+    public static double clamp(double value, double min, double max) {
+        if (min > max) throw new IllegalArgumentException("min must be <= max");
+        return Math.max(min, Math.min(max, value));
     }
 
 
