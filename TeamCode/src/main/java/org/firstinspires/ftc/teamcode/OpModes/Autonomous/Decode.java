@@ -106,9 +106,6 @@ public class Decode extends LinearOpMode {
             idle();
         }
 
-        if (isStopRequested()) {
-            return;
-        }
         // Start autonomous
         stateTimer.reset();
         sleep(5000);
@@ -229,7 +226,7 @@ public class Decode extends LinearOpMode {
         intake.stopIntake();
 
         try {
-            driveTrain.rotate(90, 0.4, imu, log);
+            driveTrain.rotateRelative(90, imu, log);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

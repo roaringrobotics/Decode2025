@@ -295,7 +295,7 @@ public class DriveTrain {
         // Normalize target to [-180, 180] or [0, 360] — here we keep it continuous but normalize error later
         // No need to normalize target itself, only the error
 
-        PID pid = new PID(0.012, 0.0001, 0.001); // Tune these: Kp, Ki, Kd
+        PID pid = new PID(0.01, 0, 0); // Tune these: Kp, Ki, Kd
         double minPower = 0.18;       // Minimum power to overcome friction — adjust based on your robot
         double toleranceDeg = 2.0;    // Consider "on target" if within this
         int settleCountsRequired = 15; // Must stay within tolerance for ~15 loops (~300ms at 20ms loop)
