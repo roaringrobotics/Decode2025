@@ -195,12 +195,34 @@ public class DriveTrain {
     }
 
     // Class to hold field centric power level output from getFieldCentricPowerLevels
-    public void driveStraight(double distance, double power, ImuPositionI imu, LogI log) throws Exception {
+    public void driveStraight(double distance, double power, ImuPositionI imu, LogI log,
+                              double kP, double kI, double kD) throws Exception {
         imu.update();
         Pose2D startPose = imu.getPose();
-        double delta = distance;
-        do {
+        Pose2D targetPose = new Pose2D(
+                DistanceUnit.INCH,
+                startPose.getX(DistanceUnit.INCH) + distance * Math.cos(Math.toRadians(imu.getHeading(AngleUnit.DEGREES))),
+                startPose.getY(DistanceUnit.INCH) + distance * Math.sin(Math.toRadians(imu.getHeading(AngleUnit.DEGREES))),
+                AngleUnit.DEGREES, imu.getHeading(AngleUnit.DEGREES));
 
+        double delta = distance;
+        PID pid = new PID(kP, kI, kD);
+        int settleCount = 0;
+        int settleCountsRequired = 10;
+        double distanceTraveled = 0;
+        while(true) {
+
+            // Exit condition: small error and settled
+            if (Math.abs(delta) <= .25) {
+                settleCount++;
+                if (settleCount >= settleCountsRequired) {
+                    break;
+                }
+            } else {
+                settleCount = 0;
+            }
+            power = pid.calculate(distance, distanceTraveled);
+            power = Math.abs(power) < 0.15 ? 0.15 * Math.signum(power) : power;
             setFrontRightPower(power);
             setFrontLeftPower(power);
             setBackRightPower(power);
@@ -210,10 +232,11 @@ public class DriveTrain {
             imu.update();
             Pose2D curPose = imu.getPose();
 
-            delta = Vector2.distanceBetweenPoses(startPose, curPose);
+            distanceTraveled = Vector2.distanceBetweenPoses(startPose, curPose);
+            delta = Vector2.distanceBetweenPoses(targetPose, curPose);
 
-             log.d("DriveStraight", String.format("Delta: %f", delta));
-        } while(delta < Math.abs(distance));
+            log.d("DriveStraight", String.format("Delta: %f", delta));
+        }
 
         stopMotors();
     }

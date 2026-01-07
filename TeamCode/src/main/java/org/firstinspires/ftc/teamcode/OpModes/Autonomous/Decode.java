@@ -81,6 +81,9 @@ public class Decode extends LinearOpMode {
         telemetry.update();
         imu.reset();
 
+        double kp = 0.045;
+        double ki = 0.0;
+        double kd = 0.0;
 
         // show init telemetry until start pressed
         while (!isStarted() && !isStopRequested()) {
@@ -101,14 +104,42 @@ public class Decode extends LinearOpMode {
             //} else {
             //    sleep(0);
             //}
+
+            double change = 0.01;
+            if(gamepad2.right_bumper) {
+                change = .001;
+            }
+
+            if(gamepad2.a && gamepad2.dpad_up) {
+                kd += .01;
+            }
+            else if(gamepad2.a && gamepad2.dpad_down) {
+                kd -= .01;
+            }
+            else if(gamepad2.b && gamepad2.dpad_up) {
+                ki += .00001;
+            }
+            else if(gamepad2.b && gamepad2.dpad_down) {
+                ki -= .00001;
+            }
+            else if(gamepad2.y && gamepad2.dpad_up) {
+                kp += .01;
+            }
+            else if(gamepad2.y && gamepad2.dpad_down) {
+                kp -= .01;
+            }
+
+            telemetry.addData("PID Values:", "kp: %.3f ki: %.5f kd: %.3f", kp, ki, kd);
             
             telemetry.addData("Side", team);
+
+            sleep(100);
             idle();
         }
 
         // Start autonomous
         stateTimer.reset();
-        sleep(5000);
+        //sleep(5000);
         targetDistance = 52;
 
         telemetry.clearAll();
@@ -122,40 +153,15 @@ public class Decode extends LinearOpMode {
 
         int count = 0;
         double startHeading = imu.getHeading(AngleUnit.DEGREES);
-        while (Math.abs(x) < targetDistance && opModeIsActive()) {
-            double PIDpower = pid.calculate(targetDistance, x);
-            PIDpower = Util.clamp(PIDpower, -1, 1);
-            log.d("", "===========================================");
-            log.d("Power1", String.valueOf(PIDpower));
-            PIDpower = rampDrive.getValue(PIDpower);
-            log.d("Power2", String.valueOf(PIDpower));
 
-            driveTrain.setFrontLeftPower(PIDpower);
-            driveTrain.setFrontRightPower(PIDpower);
-            driveTrain.setBackLeftPower(PIDpower);
-            driveTrain.setBackRightPower(PIDpower);
-
-           // driveTrain.followHeading(imu, startHeading, PIDpower, 0.03, 2);
-
-            // Update y position from hardware (placeholder logic)
-            imu.update();
-            y = imu.getPosY();
-            x = imu.getPosX();
-            h = imu.getHeading(AngleUnit.DEGREES);
-
-            telemetry.update();
-            if (count > 200) {
-                log.d("", "===========================================");
-                log.d("X Position", String.valueOf(x));
-                log.d("Y Position", String.valueOf(y));
-                log.d("Heading", String.valueOf(h));
-                log.d("Target", String.valueOf(targetDistance));
-                log.d("", "===========================================");
-                count = 0;
-            } else {
-                count++;
-            }
+        try {
+            driveTrain.driveStraight(78, 0.6, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(35, imu, log);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+        if (!isStopRequested())
+            return;
         log.d("Target", "Target Reached, Turning");
         log.d("", "===========================================");
         driveTrain.setFrontLeftPower(0);
@@ -231,7 +237,7 @@ public class Decode extends LinearOpMode {
             throw new RuntimeException(e);
         }
         try {
-            driveTrain.driveStraight(24, -0.5, imu, log);
+//            driveTrain.driveStraight(24, -0.5, imu, log);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
