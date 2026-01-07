@@ -156,7 +156,11 @@ public class Decode extends LinearOpMode {
 
         try {
             driveTrain.driveStraight(78, 0.6, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(35, imu, log);
+            driveTrain.rotateRelative(45, imu, log);
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive()) {
+                shooter.continousShoot(true, false, false);
+                sleep(5);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
