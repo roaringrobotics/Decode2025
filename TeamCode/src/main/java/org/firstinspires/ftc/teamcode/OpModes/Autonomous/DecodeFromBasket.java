@@ -73,6 +73,8 @@ public class DecodeFromBasket extends LinearOpMode {
         double y = 0;
         double x = 0;
         double h = 0;
+        double mirrorField = 1;
+        String team;
         double targetDistance;
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -83,6 +85,15 @@ public class DecodeFromBasket extends LinearOpMode {
         while (!isStarted() && !isStopRequested()) {
             telemetry.addData("Hint", "Waiting for start - update sensors/vision here");
             telemetry.update();
+            if (gamepad2.optionsWasPressed()) {
+                mirrorField = mirrorField * -1;
+            }
+            if (mirrorField == -1) {
+                team = "Red Side";
+            } else {
+                team = "Blue Side";
+            }
+            telemetry.addData("Side", team);
         }
 
         if (isStopRequested()) {
@@ -105,13 +116,13 @@ public class DecodeFromBasket extends LinearOpMode {
             shooter.resetShooter();
             sleep(1);
             driveTrain.driveStraight(-5, 0.6, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(-135, imu, log);
+            driveTrain.rotateRelative(-135 * mirrorField, imu, log);
             shooter.startIntake();
             driveTrain.driveStraight(-40, 0.4, imu, log, kp, ki, kd);
             shooter.resetShooter();
             sleep(1);
             driveTrain.driveStraight(40, 0.8, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(135, imu, log);
+            driveTrain.rotateRelative(135 * mirrorField, imu, log);
             driveTrain.driveStraight(5, 0.6, imu, log, kp, ki, kd);
 
             stateTimer.reset();
@@ -120,9 +131,9 @@ public class DecodeFromBasket extends LinearOpMode {
                 sleep(5);
             }
             shooter.resetShooter();
-            driveTrain.rotateRelative(-45, imu, log);
+            driveTrain.rotateRelative(-45 * mirrorField, imu, log);
             driveTrain.driveStraight(-24, 0.6, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(-90, imu, log);
+            driveTrain.rotateRelative(-90 * mirrorField, imu, log);
             shooter.startIntake();
             driveTrain.driveStraight(-46, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();

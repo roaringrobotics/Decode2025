@@ -151,7 +151,7 @@ public class Decode extends LinearOpMode {
 
 
 //        try {
-//            driveTrain.driveStrafe(16, 0.6, imu, log, kp, ki, kd);
+//            driveTrain.driveStrafe(2, 0.6, imu, log, kp, ki, kd);
 //        } catch (Exception e) {
 //            throw new RuntimeException(e);
 //        }
@@ -161,7 +161,7 @@ public class Decode extends LinearOpMode {
             // Please sky, rain
             shooter.startShooterMotor(0.6);
             driveTrain.driveStraight(72, 0.8, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(45, imu, log);
+            driveTrain.rotateRelative(45 * mirrorField, imu, log);
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
                 shooter.continousShoot(false, true, false);
@@ -169,13 +169,13 @@ public class Decode extends LinearOpMode {
             }
             shooter.resetShooter();
             sleep(1);
-            driveTrain.rotateRelative(-135, imu, log);
+            driveTrain.rotateRelative(-135 * mirrorField, imu, log);
             shooter.startIntake();
             driveTrain.driveStraight(-36, 0.4, imu, log, kp, ki, kd);
             shooter.resetShooter();
             sleep(1);
             driveTrain.driveStraight(36, 0.8, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(135, imu, log);
+            driveTrain.rotateRelative(135 * mirrorField, imu, log);
 
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
@@ -183,9 +183,9 @@ public class Decode extends LinearOpMode {
                 sleep(5);
             }
             shooter.resetShooter();
-            driveTrain.rotateRelative(-45, imu, log);
+            driveTrain.rotateRelative(-45 * mirrorField, imu, log);
             driveTrain.driveStraight(-24, 0.6, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(-90, imu, log);
+            driveTrain.rotateRelative(-90 * mirrorField, imu, log);
             shooter.startIntake();
             driveTrain.driveStraight(-46, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();
