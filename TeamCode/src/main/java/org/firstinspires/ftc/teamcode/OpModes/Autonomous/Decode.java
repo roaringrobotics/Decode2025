@@ -178,7 +178,7 @@ public class Decode extends LinearOpMode {
             driveTrain.rotateRelative(135, imu, log);
 
             stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
                 shooter.continousShoot(false, true, false);
                 sleep(5);
             }
