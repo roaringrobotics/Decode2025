@@ -99,38 +99,33 @@ public class Decode extends LinearOpMode {
             }
             //telemetry.addData("Add Delay, before robot starts?");
             //if(gamepad2.start){
-                //sleep(5000);
-              //  telemetry.addData("Delay Added")
+            //sleep(5000);
+            //  telemetry.addData("Delay Added")
             //} else {
             //    sleep(0);
             //}
 
             double change = 0.01;
-            if(gamepad2.right_bumper) {
+            if (gamepad2.right_bumper) {
                 change = .001;
             }
 
-            if(gamepad2.a && gamepad2.dpad_up) {
+            if (gamepad2.a && gamepad2.dpad_up) {
                 kd += .01;
-            }
-            else if(gamepad2.a && gamepad2.dpad_down) {
+            } else if (gamepad2.a && gamepad2.dpad_down) {
                 kd -= .01;
-            }
-            else if(gamepad2.b && gamepad2.dpad_up) {
+            } else if (gamepad2.b && gamepad2.dpad_up) {
                 ki += .00001;
-            }
-            else if(gamepad2.b && gamepad2.dpad_down) {
+            } else if (gamepad2.b && gamepad2.dpad_down) {
                 ki -= .00001;
-            }
-            else if(gamepad2.y && gamepad2.dpad_up) {
+            } else if (gamepad2.y && gamepad2.dpad_up) {
                 kp += .01;
-            }
-            else if(gamepad2.y && gamepad2.dpad_down) {
+            } else if (gamepad2.y && gamepad2.dpad_down) {
                 kp -= .01;
             }
 
             telemetry.addData("PID Values:", "kp: %.3f ki: %.5f kd: %.3f", kp, ki, kd);
-            
+
             telemetry.addData("Side", team);
 
             sleep(100);
@@ -154,119 +149,49 @@ public class Decode extends LinearOpMode {
         int count = 0;
         double startHeading = imu.getHeading(AngleUnit.DEGREES);
 
+
+//        try {
+//            driveTrain.driveStrafe(16, 0.6, imu, log, kp, ki, kd);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//        if (!isStopRequested())
+//            return;
         try {
             // Please sky, rain
             shooter.startShooterMotor(0.6);
             driveTrain.driveStraight(72, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(45, imu, log);
             stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 10000) {
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
                 shooter.continousShoot(false, true, false);
                 sleep(5);
             }
-
-            driveTrain.rotateRelative(-135, imu, log);
-            shooter.startIntake();
-            driveTrain.driveStraight(-30, 0.3, imu, log, kp, ki, kd);
             shooter.resetShooter();
             sleep(1);
-            driveTrain.driveStraight(30, 0.8, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(-135, imu, log);
+            shooter.startIntake();
+            driveTrain.driveStraight(-36, 0.4, imu, log, kp, ki, kd);
+            shooter.resetShooter();
+            sleep(1);
+            driveTrain.driveStraight(36, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(135, imu, log);
 
             stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 10000) {
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
                 shooter.continousShoot(false, true, false);
                 sleep(5);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        if (!isStopRequested())
-            return;
+            shooter.resetShooter();
+            driveTrain.rotateRelative(-45, imu, log);
+            driveTrain.driveStraight(-24, 0.6, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(-90, imu, log);
+            shooter.startIntake();
+            driveTrain.driveStraight(-46, 0.6, imu, log, kp, ki, kd);
+            shooter.resetShooter();
+            driveTrain.driveStraight(46, 0.6, imu, log, kp, ki, kd);
 
 
-
-
-
-
-
-
-        log.d("Target", "Target Reached, Turning");
-        log.d("", "===========================================");
-        driveTrain.setFrontLeftPower(0);
-        driveTrain.setFrontRightPower(0);
-        driveTrain.setBackLeftPower(0);
-        driveTrain.setBackRightPower(0);
-
-        telemetry.update();
-        y = imu.getPosY();
-        x = imu.getPosX();
-        log.d("X Position", String.valueOf(x));
-        log.d("Y Position", String.valueOf(y));
-        log.d("Heading", String.valueOf(h));
-        log.d("Target", String.valueOf(targetDistance));
-
-        // Rotate
-        count = 0;
-
-        double targetHeading = 38;
-        rampDrive.Reset();
-        while (Math.abs(h) < Math.abs(targetHeading) && opModeIsActive()) {
-            double PIDpower = pidRotate.calculate(targetHeading, h);
-            PIDpower = Util.clamp(PIDpower, -1, 1);
-//            PIDpower = rampDrive.getValue(PIDpower);
-            driveTrain.setFrontLeftPower(-PIDpower * mirrorField);
-            driveTrain.setFrontRightPower(PIDpower * mirrorField);
-            driveTrain.setBackLeftPower(-PIDpower * mirrorField);
-            driveTrain.setBackRightPower(PIDpower * mirrorField);
-
-            imu.update();
-            h = imu.getHeading(AngleUnit.DEGREES) * mirrorField;
-            telemetry.update();
-            if (count > 200) {
-                log.d("", "===========================================");
-                log.d("Heading ", String.valueOf(h));
-                log.d("Target", String.valueOf(targetHeading));
-                log.d("", "===========================================");
-                count = 0;
-            } else {
-                count++;
-            }
-        }
-        log.d("Target", "Target Reached Heading, Stopping");
-        log.d("", "===========================================");
-        driveTrain.setFrontLeftPower(0);
-        driveTrain.setFrontRightPower(0);
-        driveTrain.setBackLeftPower(0);
-        driveTrain.setBackRightPower(0);
-
-
-        telemetry.update();
-        y = imu.getPosY();
-        x = imu.getPosX();
-        log.d("", "End Positions for Shooting:");
-        log.d("X Position", String.valueOf(x));
-        log.d("Y Position", String.valueOf(y));
-        log.d("Heading: ", String.valueOf(h));
-
-        // Shooting
-        stateTimer.reset();
-        while (shooter.getBallsLaunched() < 3 && stateTimer.milliseconds() < 5000) {
-            shooter.continousShoot(true, false, false);
-            sleep(5);
-        }
-        shooter.stopShoot();
-        shooter.stopShooterMotor();
-        shooter.stopIntake();
-        intake.stopIntake();
-
-        try {
-            driveTrain.rotateRelative(90, imu, log);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        try {
-//            driveTrain.driveStraight(24, -0.5, imu, log);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

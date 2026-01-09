@@ -88,80 +88,48 @@ public class DecodeFromBasket extends LinearOpMode {
         if (isStopRequested()) {
             return;
         }
-
+        double kp = 0.045;
+        double ki = 0.0;
+        double kd = 0.0;
         // Start autonomous
-        stateTimer.reset();
-        sleep(5000);
-        //
-        targetDistance = 50;
+        try {
+            // Please sky, rain
+            shooter.startShooterMotor(0.6);
+            driveTrain.driveStraight(-55, 0.8, imu, log, kp, ki, kd);
 
-        telemetry.clearAll();
-        telemetry.addData("Status", "Started");
-        telemetry.addData("X Position", x);
-        telemetry.addData("Y Position", y);
-        telemetry.addData("Heading", h);
-        telemetry.addData("Target", targetDistance);
-
-        shooter.startShooterMotor(0.73);
-
-        int count = 0;
-        while (Math.abs(x) < targetDistance && opModeIsActive()) {
-            double PIDpower = pid.calculate(targetDistance, x);
-            PIDpower = Util.clamp(PIDpower, -1, 1);
-            log.d("", "===========================================");
-            log.d("Power1", String.valueOf(PIDpower));
-            PIDpower = rampDrive.getValue(PIDpower) * 0.5;
-            log.d("Power2", String.valueOf(PIDpower));
-
-            driveTrain.setFrontLeftPower(-PIDpower);
-            driveTrain.setFrontRightPower(-PIDpower);
-            driveTrain.setBackLeftPower(-PIDpower);
-            driveTrain.setBackRightPower(-PIDpower);
-
-
-            imu.update();
-            y = imu.getPosY();
-            x = imu.getPosX();
-            h = imu.getHeading(AngleUnit.DEGREES);
-
-            telemetry.update();
-            if (count > 200) {
-                log.d("", "===========================================");
-                log.d("X Position", String.valueOf(x));
-                log.d("Y Position", String.valueOf(y));
-                log.d("Heading", String.valueOf(h));
-                log.d("Target", String.valueOf(targetDistance));
-                log.d("", "===========================================");
-                count = 0;
-            } else {
-                count++;
+            stateTimer.reset();
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+                shooter.continousShoot(false, true, false);
+                sleep(5);
             }
+            shooter.resetShooter();
+            sleep(1);
+            driveTrain.driveStraight(-5, 0.6, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(-135, imu, log);
+            shooter.startIntake();
+            driveTrain.driveStraight(-40, 0.4, imu, log, kp, ki, kd);
+            shooter.resetShooter();
+            sleep(1);
+            driveTrain.driveStraight(40, 0.8, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(135, imu, log);
+            driveTrain.driveStraight(5, 0.6, imu, log, kp, ki, kd);
+
+            stateTimer.reset();
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
+                shooter.continousShoot(false, true, false);
+                sleep(5);
+            }
+            shooter.resetShooter();
+            driveTrain.rotateRelative(-45, imu, log);
+            driveTrain.driveStraight(-24, 0.6, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(-90, imu, log);
+            shooter.startIntake();
+            driveTrain.driveStraight(-46, 0.6, imu, log, kp, ki, kd);
+            shooter.resetShooter();
+            driveTrain.driveStraight(46, 0.6, imu, log, kp, ki, kd);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        log.d("Target", "Target Reached, Shooting");
-        log.d("", "===========================================");
-        driveTrain.setFrontLeftPower(0);
-        driveTrain.setFrontRightPower(0);
-        driveTrain.setBackLeftPower(0);
-        driveTrain.setBackRightPower(0);
-
-        telemetry.update();
-        y = imu.getPosY();
-        x = imu.getPosX();
-        log.d("X Position", String.valueOf(x));
-        log.d("Y Position", String.valueOf(y));
-        log.d("Heading", String.valueOf(h));
-        log.d("Target", String.valueOf(targetDistance));
-
-        // Shooting
-
-        sleep(2000);
-        shooter.continousShoot(true, false, false);
-
-        sleep(3500);
-
-
-        shooter.stopShoot();
-        shooter.stopShooterMotor();
-        intake.stopIntake();
     }
 }
