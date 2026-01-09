@@ -16,7 +16,7 @@ public class Shooter {
     public long lastTime;
     public double lastVelocity;
     //private double[] velocityBuffer = {(1430*Math.PI), (1573*Math.PI), (1716*Math.PI)};
-    private double[] velocityBuffer = {(1300), (1400), (1500)};
+    private double[] velocityBuffer = {(1200), (1350), (1550)};
     private double allowedError = 50.0;
     private Intake intake;
     public AndroidLog log;
@@ -226,6 +226,14 @@ public class Shooter {
     }
     public int getBallsLaunched() {
         return ballsLaunched;
+    }
+    public void resetShooter() {
+        ShooterState = ShooterState.IDLE;
+        lastShooterState = ShooterState.IDLE;
+        ballsLaunched = 0;
+        stopIntake();
+        stopShooterMotor();
+        stopShoot();
     }
 }
 

@@ -276,8 +276,8 @@ public class DriveTrain {
             double rightPower = basePower + headingCorrection;
 
             // Clamp powers
-            leftPower = Math.max(-1.0, Math.min(1.0, leftPower));
-            rightPower = Math.max(-1.0, Math.min(1.0, rightPower));
+            leftPower = Math.max(-power, Math.min(power, leftPower));
+            rightPower = Math.max(-power, Math.min(power, rightPower));
 
             // Set motor powers (use set* methods so motor direction config is respected)
             setFrontLeftPower(leftPower);

@@ -155,10 +155,27 @@ public class Decode extends LinearOpMode {
         double startHeading = imu.getHeading(AngleUnit.DEGREES);
 
         try {
-            driveTrain.driveStraight(78, 0.6, imu, log, kp, ki, kd);
+            // Please sky, rain
+            shooter.startShooterMotor(0.6);
+            driveTrain.driveStraight(72, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(45, imu, log);
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive()) {
-                shooter.continousShoot(true, false, false);
+            stateTimer.reset();
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 10000) {
+                shooter.continousShoot(false, true, false);
+                sleep(5);
+            }
+
+            driveTrain.rotateRelative(-135, imu, log);
+            shooter.startIntake();
+            driveTrain.driveStraight(-30, 0.3, imu, log, kp, ki, kd);
+            shooter.resetShooter();
+            sleep(1);
+            driveTrain.driveStraight(30, 0.8, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(135, imu, log);
+
+            stateTimer.reset();
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 10000) {
+                shooter.continousShoot(false, true, false);
                 sleep(5);
             }
         } catch (Exception e) {
@@ -166,6 +183,14 @@ public class Decode extends LinearOpMode {
         }
         if (!isStopRequested())
             return;
+
+
+
+
+
+
+
+
         log.d("Target", "Target Reached, Turning");
         log.d("", "===========================================");
         driveTrain.setFrontLeftPower(0);
