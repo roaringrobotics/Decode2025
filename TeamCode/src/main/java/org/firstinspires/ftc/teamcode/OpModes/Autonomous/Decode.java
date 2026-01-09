@@ -131,7 +131,7 @@ public class Decode extends LinearOpMode {
             sleep(100);
             idle();
         }
-
+//
         // Start autonomous
         stateTimer.reset();
         //sleep(5000);
