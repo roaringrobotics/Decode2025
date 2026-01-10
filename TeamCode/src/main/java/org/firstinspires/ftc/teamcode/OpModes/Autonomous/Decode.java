@@ -83,7 +83,7 @@ public class Decode extends LinearOpMode {
 
         double kp = 0.045;
         double ki = 0.0;
-        double kd = 0.0;
+        double kd = 0.11;
 
         // show init telemetry until start pressed
         while (!isStarted() && !isStopRequested()) {
