@@ -79,14 +79,18 @@ public class Shooter {
     }
 
 
-    public void stopShoot() {
+    public void stopShootServos() {
         blueServo.setPower(0);
         blackServo.setPower(0);
     }
 
-    public void startShoot() {
+    public void startShootServos() {
         blueServo.setPower(-1);
         blackServo.setPower(1);
+    }
+    public void reverseShootServos() {
+        blueServo.setPower(1);
+        blackServo.setPower(-1);
     }
 
     public void toggleShooterMotor65(boolean toggle) {
@@ -128,9 +132,9 @@ public class Shooter {
     public void toggleShooterFeeders(boolean toggle) {
         if (toggle) {
             if (blueServo.getPower() != 0) // feeders running
-                stopShoot();
+                stopShootServos();
             else
-                startShoot();
+                startShootServos();
         }
     }
 
@@ -168,7 +172,7 @@ public class Shooter {
             }
 
             stopShooterMotor();
-            stopShoot();
+            stopShootServos();
             intake.stopIntake();
             ShooterState = ShooterState.IDLE;
 
@@ -196,11 +200,11 @@ public class Shooter {
             }
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
                 ShooterState = ShooterState.SHOOTING;
-                startShoot();
+                startShootServos();
                 intake.startIntake(1.0);
             } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
                 startShooterMotor(targetVelocity);
-                stopShoot();
+                stopShootServos();
                 lastShooterState = ShooterState.SHOOTING;
                 ShooterState = ShooterState.SPINNING_UP;
 
@@ -233,7 +237,7 @@ public class Shooter {
         ballsLaunched = 0;
         stopIntake();
         stopShooterMotor();
-        stopShoot();
+        stopShootServos();
     }
 }
 

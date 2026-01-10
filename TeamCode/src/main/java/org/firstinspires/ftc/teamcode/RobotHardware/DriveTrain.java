@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -544,7 +545,18 @@ public class DriveTrain {
         if (log != null) {
             log.d("DriveStrafe", "Complete. Traveled: " + distanceTraveled);
         }
-
     }
+    public double powerScaler(boolean halfSpeed, boolean quarterSpeed) {
+        double powerScale;
+        if (halfSpeed) {
+            powerScale = 0.5;
+        } else if (quarterSpeed) {
+            powerScale = 0.25;
+        } else {
+            powerScale = 1.0;
+        }
+        return powerScale;
+    }
+
 }
 

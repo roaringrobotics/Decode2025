@@ -209,12 +209,12 @@ public class DecodeShort extends LinearOpMode {
 
             sleep(3000);
             shooter.startShooterMotor(0.88);
-            shooter.startShoot();
+            shooter.startShootServos();
             intake.startIntake(0.8);
             sleep(5000);
 
 
-            shooter.stopShoot();
+            shooter.stopShootServos();
             shooter.stopShooterMotor();
             intake.stopIntake();
         }

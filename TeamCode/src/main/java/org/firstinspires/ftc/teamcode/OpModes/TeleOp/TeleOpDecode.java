@@ -3,9 +3,7 @@ package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
@@ -23,16 +21,8 @@ public class TeleOpDecode extends LinearOpMode {
     private SystemTimeSource timesource = new SystemTimeSource();
     private final AndroidLog log = new AndroidLog();
 
-    // private Intake intake;
-    private ButtonState lastAButtonState = ButtonState.NOT_PRESSED;
-
-    private enum ButtonState {
-        PRESSED,
-        NOT_PRESSED
-    }
-
     // 3. Add a timer to debounce the button
-    private ElapsedTime buttonTimer = new ElapsedTime();
+
 
     public void runOpMode() throws InterruptedException {
         driveTrain = new DriveTrain(hardwareMap);
@@ -41,33 +31,44 @@ public class TeleOpDecode extends LinearOpMode {
         shooter = new Shooter(hardwareMap, intake, log);
         //  intake = new Intake(hardwareMap);
         waitForStart();
-        float deadZone = 0.75F;
+        float deadZone = 0.5F;
         while (opModeIsActive()) {
             double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
-            driveTrain.driveFieldCentric(drive, strafe, rotate, 1, hw);
+            double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
+
+
+            driveTrain.driveFieldCentric(drive, strafe, rotate, powerScale, hw);
 
             timesource.update();
 
             shooter.continousShoot(gamepad2.a, gamepad2.b, gamepad2.y);
 
-            if(!gamepad2.a && !gamepad2.b && !gamepad2.y) {
+            if (!gamepad2.a && !gamepad2.b && !gamepad2.y) {
 
-                if (gamepad2.right_trigger > 0.5) {
+                if (gamepad2.right_trigger > deadZone)
                     shooter.startIntake();
-                } else {
-                    shooter.stopIntake();
-                }
-                if (gamepad2.left_trigger > 0.5) {
+                else if (gamepad2.left_trigger > deadZone)
                     shooter.reverseIntake();
-                }
+                else
+                    shooter.stopIntake();
+
+                if (gamepad2.dpad_left)
+                    shooter.reverseShootServos();
+                else if (gamepad2.dpad_right)
+                    shooter.startShootServos();
+                else
+                    shooter.stopShootServos();
+
+
             }
             if (gamepad1.options) {
                 hw.resetImu();
             }
 
         }
+
     }
 }
 
