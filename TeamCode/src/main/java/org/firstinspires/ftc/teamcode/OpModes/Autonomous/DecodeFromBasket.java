@@ -103,6 +103,10 @@ public class DecodeFromBasket extends LinearOpMode {
         double ki = 0.0;
         double kd = 0.12;
         // Start autonomous
+
+        // these are for strafing
+        double kps = 0.13;
+        double kds = 0.29;
         try {
             // Please sky, rain
             shooter.startShooterMotor(0.6);
@@ -115,15 +119,14 @@ public class DecodeFromBasket extends LinearOpMode {
             }
             shooter.resetShooter();
             sleep(1);
-            driveTrain.driveStraight(-5, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStrafe(-5, 0.8, imu, log, kps, ki, kds);
             driveTrain.rotateRelative(-135 * mirrorField, imu, log);
             shooter.startIntake();
-            driveTrain.driveStraight(-40, 0.4, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(-39, 0.4, imu, log, kp, ki, kd);
             shooter.resetShooter();
             sleep(1);
-            driveTrain.driveStraight(40, 0.8, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(39, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(135 * mirrorField, imu, log);
-            driveTrain.driveStraight(5, 0.6, imu, log, kp, ki, kd);
 
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
@@ -131,13 +134,12 @@ public class DecodeFromBasket extends LinearOpMode {
                 sleep(5);
             }
             shooter.resetShooter();
-            driveTrain.rotateRelative(-45 * mirrorField, imu, log);
-            driveTrain.driveStraight(-24, 0.6, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(-90 * mirrorField, imu, log);
+            driveTrain.rotateRelative(-135 * mirrorField, imu, log);
+            driveTrain.driveStrafe(24, 0.7, imu, log, kps, ki, kds);
             shooter.startIntake();
-            driveTrain.driveStraight(-46, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(-40, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();
-            driveTrain.driveStraight(46, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(4, 0.6, imu, log, kp, ki, kd);
 //
         } catch (Exception e) {
             throw new RuntimeException(e);

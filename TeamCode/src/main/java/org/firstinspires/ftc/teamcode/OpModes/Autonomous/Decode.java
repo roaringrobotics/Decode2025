@@ -85,6 +85,11 @@ public class Decode extends LinearOpMode {
         double ki = 0.0;
         double kd = 0.11;
 
+        // these are for strafing
+        double kps = 0.13;
+        double kds = 0.29;
+
+
         // show init telemetry until start pressed
         while (!isStarted() && !isStopRequested()) {
             telemetry.addData("Hint", "Waiting for start - update sensors/vision here");
@@ -111,20 +116,20 @@ public class Decode extends LinearOpMode {
             }
 
             if (gamepad2.a && gamepad2.dpad_up) {
-                kd += .01;
+                kds += .01;
             } else if (gamepad2.a && gamepad2.dpad_down) {
-                kd -= .01;
+                kds -= .01;
             } else if (gamepad2.b && gamepad2.dpad_up) {
                 ki += .00001;
             } else if (gamepad2.b && gamepad2.dpad_down) {
                 ki -= .00001;
             } else if (gamepad2.y && gamepad2.dpad_up) {
-                kp += .01;
+                kps += .01;
             } else if (gamepad2.y && gamepad2.dpad_down) {
-                kp -= .01;
+                kps -= .01;
             }
 
-            telemetry.addData("PID Values:", "kp: %.3f ki: %.5f kd: %.3f", kp, ki, kd);
+            telemetry.addData("PID Values:", "kp: %.3f ki: %.5f kd: %.3f", kps, ki, kds);
 
             telemetry.addData("Side", team);
 
@@ -150,15 +155,8 @@ public class Decode extends LinearOpMode {
         double startHeading = imu.getHeading(AngleUnit.DEGREES);
 
 
-//        try {
-//            driveTrain.driveStrafe(2, 0.6, imu, log, kp, ki, kd);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//        if (!isStopRequested())
-//            return;
         try {
-            // Please sky, rain
+            // This comment is helpful
             shooter.startShooterMotor(0.6);
             driveTrain.driveStraight(72, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(45 * mirrorField, imu, log);
@@ -183,13 +181,12 @@ public class Decode extends LinearOpMode {
                 sleep(5);
             }
             shooter.resetShooter();
-            driveTrain.rotateRelative(-45 * mirrorField, imu, log);
-            driveTrain.driveStraight(-24, 0.6, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(-90 * mirrorField, imu, log);
+            driveTrain.rotateRelative(-135 * mirrorField, imu, log);
+            driveTrain.driveStrafe(24, 0.7, imu, log, kps, ki, kds);
             shooter.startIntake();
-            driveTrain.driveStraight(-46, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(-40, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();
-            driveTrain.driveStraight(46, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(4, 0.6, imu, log, kp, ki, kd);
 
 
         } catch (Exception e) {
