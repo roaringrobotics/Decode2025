@@ -139,7 +139,14 @@ public class DecodeFromBasket extends LinearOpMode {
             shooter.startIntake();
             driveTrain.driveStraight(-40, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();
-            driveTrain.driveStraight(4, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(40, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStrafe(-24, 0.7, imu, log, kps, ki, kds);
+            driveTrain.rotateRelative(135 * mirrorField, imu, log);
+
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive()) {
+                shooter.continousShoot(false, true, false);
+                sleep(5);
+            }
 //
         } catch (Exception e) {
             throw new RuntimeException(e);
