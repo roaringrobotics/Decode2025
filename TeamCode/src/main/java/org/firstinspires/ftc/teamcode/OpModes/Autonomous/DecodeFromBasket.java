@@ -101,7 +101,7 @@ public class DecodeFromBasket extends LinearOpMode {
         }
         double kp = 0.045;
         double ki = 0.0;
-        double kd = 0.12;
+        double kd = 0.13;
         // Start autonomous
 
         // these are for strafing
@@ -119,13 +119,13 @@ public class DecodeFromBasket extends LinearOpMode {
             }
             shooter.resetShooter();
             sleep(1);
-            driveTrain.driveStrafe(-5, 0.8, imu, log, kps, ki, kds);
-            driveTrain.rotateRelative(-135 * mirrorField, imu, log);
+            driveTrain.driveStrafe(-13, 0.8, imu, log, kps, ki, kds);
+            driveTrain.rotateRelative(-142 * mirrorField, imu, log);
             shooter.startIntake();
-            driveTrain.driveStraight(-39, 0.4, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(-38, 0.4, imu, log, kp, ki, kd);
             shooter.resetShooter();
             sleep(1);
-            driveTrain.driveStraight(39, 0.8, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(38, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(135 * mirrorField, imu, log);
 
             stateTimer.reset();
