@@ -1,3 +1,4 @@
+// language: java
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -25,8 +26,8 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
   - helper methods to set/stop drive power
 */
 
-@Autonomous(name = "DecodeFromBasket", group = "Autonomous")
-public class DecodeFromBasket extends LinearOpMode {
+//@Autonomous(name = "StrafeTest", group = "Autonomous")
+public class StrafeTest extends LinearOpMode {
 
     private DriveTrain driveTrain;
     private Shooter shooter;
@@ -47,12 +48,13 @@ public class DecodeFromBasket extends LinearOpMode {
         imu = new PinpointImpl(hardwareMap);
         intake = new Intake(hardwareMap);
         shooter = new Shooter(hardwareMap, intake, log);
-        PID pid = new PID(0.8, 0, 0);
-        PID pidRotate = new PID(0.02, 0, 0);
+
         PowerRampController rampDrive = new PowerRampController(
                 .1,
                 new SystemTimeSource());
-
+        double kp = 0.13;
+        double ki = 0.0;
+        double kd = 0.29;
 
 //        Through testing y's and x's are flipped
 //        instead of:
@@ -73,13 +75,14 @@ public class DecodeFromBasket extends LinearOpMode {
         double y = 0;
         double x = 0;
         double h = 0;
+        double targetDistance = 0;
         double mirrorField = 1;
-        String team;
-        double targetDistance;
+        String team = "Blue Side";
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         imu.reset();
 
+        double change = 0.01;
 
         // show init telemetry until start pressed
         while (!isStarted() && !isStopRequested()) {
@@ -93,56 +96,42 @@ public class DecodeFromBasket extends LinearOpMode {
             } else {
                 team = "Blue Side";
             }
-            telemetry.addData("Side", team);
+
+            if (gamepad2.rightBumperWasPressed()) {
+                change *= 0.1;
+            } else if (gamepad2.leftBumperWasPressed()) {
+                change *= 10;
+            }
+
+
+            if (gamepad2.a && gamepad2.dpadUpWasReleased()) {
+                kd += change;
+            } else if (gamepad2.a && gamepad2.dpadDownWasPressed()) {
+                kd -= change;
+            } else if (gamepad2.b && gamepad2.dpadUpWasReleased()) {
+                ki += change;
+            } else if (gamepad2.b && gamepad2.dpadDownWasPressed()) {
+                ki -= change;
+            } else if (gamepad2.y && gamepad2.dpadUpWasReleased()) {
+                kp += change;
+            } else if (gamepad2.y && gamepad2.dpadDownWasPressed()) {
+                kp -= change;
+            }
+
+            telemetry.addData("PID Values:", "kp: %.5f ki: %.5f kd: %.5f", kp, ki, kd);
+            telemetry.addData("PID Change:", change);
+            idle();
         }
 
         if (isStopRequested()) {
             return;
         }
-        double kp = 0.045;
-        double ki = 0.0;
-        double kd = 0.13;
+
         // Start autonomous
+        stateTimer.reset();
 
-        // these are for strafing
-        double kps = 0.13;
-        double kds = 0.29;
         try {
-            // Please sky, rain
-            shooter.startShooterMotor(0.6);
-            driveTrain.driveStraight(-55, 0.8, imu, log, kp, ki, kd);
-
-            stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
-                shooter.continousShoot(false, true, false);
-                sleep(5);
-            }
-            shooter.resetShooter();
-            sleep(1);
-            driveTrain.driveStrafe(-13, 0.8, imu, log, kps, ki, kds);
-            driveTrain.rotateRelative(-142 * mirrorField, imu, log);
-            shooter.startIntake();
-            driveTrain.driveStraight(-38, 0.4, imu, log, kp, ki, kd);
-            shooter.resetShooter();
-            sleep(1);
-            driveTrain.driveStraight(38, 0.8, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(138 * mirrorField, imu, log);
-
-            stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
-                shooter.continousShoot(false, true, false);
-                sleep(5);
-            }
-            shooter.resetShooter();
-            driveTrain.rotateRelative(-138 * mirrorField, imu, log);
-            driveTrain.driveStrafe(22, 0.8, imu, log, kps, ki, kds);
-            shooter.startIntake();
-            driveTrain.driveStraight(-40, 0.6, imu, log, kp, ki, kd);
-            shooter.resetShooter();
-            driveTrain.driveStraight(4, 0.4, imu, log, kp, ki, kd);
-//            driveTrain.driveStrafe(-24, 0.8, imu, log, kps, ki, kds);
-//            driveTrain.rotateRelative(138 * mirrorField, imu, log);
-//
+            driveTrain.driveStrafe(24, 0.9, imu, log, kp, ki, kd);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
