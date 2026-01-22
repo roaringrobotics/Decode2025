@@ -119,7 +119,7 @@ public class DecodeFromBasket extends LinearOpMode {
             }
             shooter.resetShooter();
             sleep(1);
-            driveTrain.driveStrafe(-13, 0.8, imu, log, kps, ki, kds);
+            driveTrain.driveStrafe(-13 * mirrorField, 0.8, imu, log, kps, ki, kds);
             driveTrain.rotateRelative(-142 * mirrorField, imu, log);
             shooter.startIntake();
             driveTrain.driveStraight(-38, 0.4, imu, log, kp, ki, kd);
@@ -135,7 +135,7 @@ public class DecodeFromBasket extends LinearOpMode {
             }
             shooter.resetShooter();
             driveTrain.rotateRelative(-138 * mirrorField, imu, log);
-            driveTrain.driveStrafe(22, 0.8, imu, log, kps, ki, kds);
+            driveTrain.driveStrafe(22 * mirrorField, 0.8, imu, log, kps, ki, kds);
             shooter.startIntake();
             driveTrain.driveStraight(-40, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();

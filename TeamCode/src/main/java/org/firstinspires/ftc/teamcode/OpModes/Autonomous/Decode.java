@@ -43,7 +43,18 @@ public class Decode extends LinearOpMode {
     private final ElapsedTime stateTimer = new ElapsedTime();
 
     @Override
-    public void runOpMode() {
+    public void
+
+
+
+
+
+
+
+
+
+
+    runOpMode() {
         driveTrain = new DriveTrain(hardwareMap);
         imu = new PinpointImpl(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -182,7 +193,7 @@ public class Decode extends LinearOpMode {
             }
             shooter.resetShooter();
             driveTrain.rotateRelative(-135 * mirrorField, imu, log);
-            driveTrain.driveStrafe(24, 0.7, imu, log, kps, ki, kds);
+            driveTrain.driveStrafe(24 * mirrorField, 0.7, imu, log, kps, ki, kds);
             shooter.startIntake();
             driveTrain.driveStraight(-40, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();

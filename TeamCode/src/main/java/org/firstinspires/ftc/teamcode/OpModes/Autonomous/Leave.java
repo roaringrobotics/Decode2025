@@ -54,21 +54,22 @@ public class Leave extends LinearOpMode {
                 new SystemTimeSource());
 
 
-//        Through testing y's and x's are flipped
-//        instead of:
-//                y
-//                |
-//                |
-//       ------------------x
-//                |
-//                |
-//         we have:
-//                x
-//                |
-//                |
-//       ------------------y
-//                |
-//                |
+/*     Through testing y's and x's are flipped
+        instead of:
+                y
+                |
+                |
+       ------------------x
+                |
+                |
+         we have:
+                x
+                |
+                |
+       ------------------y
+                |
+                |
+*/
 
         double y = 0;
         double x = 0;
@@ -107,7 +108,7 @@ public class Leave extends LinearOpMode {
         try {
             driveTrain.driveStraight(4, 0.3, imu, log, 0.045, 0, 0);
             driveTrain.rotateRelative(-90 * mirrorField, imu, log);
-            driveTrain.driveStraight(-15, 0.4, imu, log, 0.045, 0, 0);
+            driveTrain.driveStraight(-18, 0.4, imu, log, 0.045, 0, 0);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
