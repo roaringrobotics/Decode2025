@@ -119,15 +119,31 @@ public class DecodeShort extends LinearOpMode {
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
                 shooter.continousShoot(false, false, true);
             }
-
-            shooter.resetShooter();
-            driveTrain.rotateRelative(-115 * mirrorField, imu, log);
-            driveTrain.driveStrafe(-20,.7,imu,log, kps, ki, kds);
-            shooter.startIntake();
-            driveTrain.driveStraight(-30, .5, imu, log, kp, ki, kd);
-            shooter.stopIntake();
-            driveTrain.driveStraight(30, .8, imu, log, kp, ki, kd);
-
+            for (int i = 0; i < 3; i++) {
+                shooter.resetShooter();
+                driveTrain.rotateRelative(-115 * mirrorField, imu, log);
+                driveTrain.driveStrafe(-20, .7, imu, log, kps, ki, kds);
+                shooter.startIntake();
+                driveTrain.driveStraight(-30, .5, imu, log, kp, ki, kd);
+                shooter.stopIntake();
+                driveTrain.driveStraight(30, .8, imu, log, kp, ki, kd);
+                driveTrain.rotateRelative(115 * mirrorField, imu, log);
+                stateTimer.reset();
+                shooter.resetShooter();
+                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+                    shooter.continousShoot(false, false, true);
+                }
+                if (i == 1){
+                    while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+                        shooter.continousShoot(false, true, false);
+                }
+                }
+                if(i == 2) {
+                    while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+                        shooter.continousShoot(true, false, false);
+                    }
+                }
+            }
     }   catch (Exception e) {
             throw new RuntimeException(e);
         }

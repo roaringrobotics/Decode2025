@@ -300,6 +300,14 @@ public class DriveTrain {
             log.d("DriveStraight", "Complete. Traveled: " + distanceTraveled);
         }
     }
+    public void driveLinear(double distance,
+                            double degrees,
+                            double power,
+                            ImuPositionI imu,
+                            LogI log) {
+
+
+    }
 
 
     public void rotate(double targetAngleDeg, ImuPositionI imu, LogI log) throws Exception {
