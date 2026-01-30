@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
 import org.firstinspires.ftc.teamcode.RobotHardware.VelocityTestHardware;
 
-@TeleOp
+//@TeleOp
 public class VelocitySysTest extends OpMode {
 
     private VelocityTestHardware shooter;

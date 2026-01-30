@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
 import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
 import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 
-@TeleOp
-public class TeleOpDecode extends LinearOpMode {
+@TeleOp(name = "Single Controller")
+public class DecodeSingleTeleop extends LinearOpMode {
     private DriveTrain driveTrain;
     private Shooter shooter;
     private Hardware hw;
@@ -43,23 +43,23 @@ public class TeleOpDecode extends LinearOpMode {
 
             timesource.update();
 
-            if (gamepad2.left_bumper)
+            if (gamepad1.dpad_down)
                 shooter.singleShoot(gamepad2.a, gamepad2.b, gamepad2.y);
             else
                 shooter.continousShoot(gamepad2.a, gamepad2.b, gamepad2.y);
 
-            if (!gamepad2.a && !gamepad2.b && !gamepad2.y) {
+            if (!gamepad1.a && !gamepad1.b && !gamepad1.y) {
 
-                if (gamepad2.right_trigger > deadZone)
+                if (gamepad1.right_trigger > deadZone)
                     shooter.startIntake();
-                else if (gamepad2.left_trigger > deadZone)
+                else if (gamepad1.left_trigger > deadZone)
                     shooter.reverseIntake();
                 else
                     shooter.stopIntake();
 
-                if (gamepad2.dpad_left)
+                if (gamepad1.dpad_left)
                     shooter.reverseShootServos();
-                else if (gamepad2.dpad_right)
+                else if (gamepad1.dpad_right)
                     shooter.startShootServos();
                 else
                     shooter.stopShootServos();

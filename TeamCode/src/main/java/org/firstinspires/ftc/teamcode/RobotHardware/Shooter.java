@@ -160,7 +160,7 @@ public class Shooter {
             targetVelocity = velocityBuffer[2];
         }
 
-        if (allOff || ballsLaunched == 3 && !empty) {
+        if (allOff || ballsLaunched >= 1 && !empty) {
             if (allOff) {
                 ballsLaunched = 0;
                 // eventually we will add logic to detect if there are balls in the shooter
@@ -211,6 +211,70 @@ public class Shooter {
 
             }
         }
+    }
+    public void singleShoot(boolean buttonShort, boolean buttonMid, boolean buttonLong) {
+        boolean allOff = !buttonShort && !buttonMid && !buttonLong;
+        boolean anyOn = buttonShort || buttonMid || buttonLong;
+
+        double targetVelocity = 0.0;
+        if(buttonShort) {
+            targetVelocity = velocityBuffer[0];
+        } else if (buttonMid) {
+            targetVelocity = velocityBuffer[1];
+        } else if (buttonLong) {
+            targetVelocity = velocityBuffer[2];
+        }
+
+        if (allOff || ballsLaunched == 3 && !empty) {
+            if (allOff) {
+                ballsLaunched = 0;
+                // eventually we will add logic to detect if there are balls in the shooter
+                empty = false;
+            } else {
+                empty = true;
+
+            }
+
+            stopShooterMotor();
+            stopShootServos();
+            ShooterState = ShooterState.IDLE;
+
+        } else if (anyOn) {
+            double currentVel = shooterMotor.getVelocity();
+            double currentVelDeg = shooterMotor.getVelocity(AngleUnit.DEGREES);
+            log.d("Shooter", "-----------------------------------");
+            log.d("Shooter", "Velocity (rag): " + currentVel);
+            log.d("Shooter", "Velocity (deg): " + currentVelDeg);
+            log.d("Shooter", "Target Velocity: " + targetVelocity);
+            log.d("Shooter", "State: " + ShooterState.toString());
+            log.d("Shooter", "Balls Launched: " + ballsLaunched);
+            if(ShooterState == ShooterState.IDLE) {
+                startShooterMotor(targetVelocity);
+                ShooterState = ShooterState.SPINNING_UP;
+            }
+            else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) > allowedError) {
+                if (lastShooterState == ShooterState.SHOOTING) {
+                    ballsLaunched++;
+                    lastShooterState = ShooterState.SPINNING_UP;
+                }
+
+                startShooterMotor(targetVelocity);
+                //
+            }
+            else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
+                ShooterState = ShooterState.SHOOTING;
+                startShootServos();
+            } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
+                startShooterMotor(targetVelocity);
+                stopShootServos();
+                lastShooterState = ShooterState.SHOOTING;
+                ShooterState = ShooterState.SPINNING_UP;
+
+
+
+            }
+        }
+
     }
 
     public void startIntake() {
