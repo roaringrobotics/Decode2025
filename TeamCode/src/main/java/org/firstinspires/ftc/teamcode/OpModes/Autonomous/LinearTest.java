@@ -131,7 +131,8 @@ public class LinearTest extends LinearOpMode {
         stateTimer.reset();
 
         try {
-            driveTrain.driveStrafe(24, 0.9, imu, log, kp, ki, kd);
+            driveTrain.driveLinear(26, 26, 45, 0.5, imu, log);
+            driveTrain.stopMotors();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
