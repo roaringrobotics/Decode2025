@@ -407,16 +407,16 @@ public class DriveTrain {
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
-            double flPower = (robotY + robotX + rotatePower) / denom;
-            double blPower = (robotY - robotX + rotatePower) / denom;
-            double frPower = (robotY - robotX - rotatePower) / denom;
-            double brPower = (robotY + robotX - rotatePower) / denom;
+            double flPower = (robotY + robotX - rotatePower) / denom;
+            double blPower = (robotY - robotX - rotatePower) / denom;
+            double frPower = (robotY - robotX + rotatePower) / denom;
+            double brPower = (robotY + robotX + rotatePower) / denom;
 
             // Apply power limit and signs (matching your motor configuration)
-            setFrontLeftPower(flPower * -power);
-            setBackLeftPower(-blPower * -power);    // Note the negative
-            setFrontRightPower(-frPower * -power);   // Note the negative
-            setBackRightPower(brPower * -power);
+            setFrontLeftPower(flPower * power);
+            setBackLeftPower(blPower * power);    // Note the negative
+            setFrontRightPower(frPower * power);   // Note the negative
+            setBackRightPower(brPower * power);
 
             if (log != null) {
                 log.d("DriveLinear", String.format("Dist: %.2f Angle: %.1f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f",
