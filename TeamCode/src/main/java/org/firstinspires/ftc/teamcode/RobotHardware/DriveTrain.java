@@ -658,10 +658,10 @@ public class DriveTrain {
             rightPower = Math.max(-power, Math.min(power, rightPower));
 
             // Set motor powers (use set* methods so motor direction config is respected)
-            setFrontLeftPower(leftPower);
-            setBackLeftPower(-leftPower);
-            setFrontRightPower(-rightPower);
-            setBackRightPower(rightPower);
+            setFrontLeftPower(-leftPower);
+            setBackLeftPower(leftPower);
+            setFrontRightPower(rightPower);
+            setBackRightPower(-rightPower);
 
             if (log != null) {
                 log.d("DriveStraight", String.format("rem: %.3f trav: %.3f base: %.3f L: %.3f R: %.3f hErr: %.2f",
