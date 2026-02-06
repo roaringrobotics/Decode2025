@@ -109,12 +109,14 @@ public class DecodeFromBasket extends LinearOpMode {
         double kds = 0.29;
         try {
             // Please sky, rain
-            shooter.startShooterMotor(0.6);
+            shooter.startShooterMotor(1000);
             driveTrain.driveStraight(55, 0.8, imu, log, kp, ki, kd);
 
             stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+            //
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 3000) {
                 shooter.continousShoot(false, true, false);
+                log.d("Shooter", "Timer: " + stateTimer.milliseconds());
                 sleep(5);
             }
             shooter.resetShooter();

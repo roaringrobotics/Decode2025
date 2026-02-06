@@ -306,7 +306,7 @@ public class DriveTrain {
                             double power,
                             boolean isRed,
                             ImuPositionI imu,
-                            LogI log) throws Exception {
+                            LogI log, double kp, double ki, double kd) throws Exception {
         imu.update();
         Pose2D startPose = imu.getPose();
         if (isRed) {
@@ -324,8 +324,8 @@ public class DriveTrain {
         double targetDistance = Math.sqrt(x * x + y * y);
 
         // PID controllers
-        PID drivePID = new PID(0.1, 0.0, 0.01);     // For position control
-        PID rotatePID = new PID(0.012, 0.0001, 0.001); // For rotation control
+        PID drivePID = new PID(0.23, ki, 0);     // For position control
+        PID rotatePID = new PID(kp, ki, kd); // For rotation control
 
         final double distanceTolerance = 0.5;  // inches
         final double angleTolerance = 2.0;     // degrees
@@ -411,20 +411,26 @@ public class DriveTrain {
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
-            double flPower = (robotY + robotX - rotatePower) / denom;
-            double blPower = (robotY - robotX - rotatePower) / denom;
-            double frPower = (robotY - robotX + rotatePower) / denom;
-            double brPower = (robotY + robotX + rotatePower) / denom;
+            double flPower = (robotY + robotX + rotatePower) / denom;
+            double blPower = -(robotY - robotX - rotatePower) / denom;
+            double frPower = -(robotY - robotX + rotatePower) / denom;
+            double brPower = (robotY + robotX - rotatePower) / denom;
 
             // Apply power limit and signs (matching your motor configuration)
             setFrontLeftPower(flPower * power);
-            setBackLeftPower(blPower * power);    // Note the negative
-            setFrontRightPower(frPower * power);   // Note the negative
+            setBackLeftPower(blPower * power);
+            setFrontRightPower(frPower * power);
             setBackRightPower(brPower * power);
 
+            /*
+            fcPowerLevels.frontLeftPower = -(rotatedY + rotatedX - rotate) / denom;
+            fcPowerLevels.backLeftPower = (rotatedY - rotatedX - rotate) / denom;
+            fcPowerLevels.frontRightPower = (rotatedY - rotatedX + rotate) / denom;
+            fcPowerLevels.backRightPower = -(rotatedY + rotatedX + rotate) / denom;
+             */
             if (log != null) {
-                log.d("DriveLinear", String.format("Dist: %.2f Angle: %.1f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f",
-                        remainingDistance, headingError, flPower, frPower, blPower, brPower));
+                log.d("DriveLinear", String.format("Dist: %.2f Angle: %.1f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, SC: %d",
+                        remainingDistance, headingError, flPower, frPower, blPower, brPower, settleCount));
             }
 
             sleep(20);

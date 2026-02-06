@@ -52,9 +52,9 @@ public class LinearTest extends LinearOpMode {
         PowerRampController rampDrive = new PowerRampController(
                 .1,
                 new SystemTimeSource());
-        double kp = 0.13;
-        double ki = 0.0;
-        double kd = 0.29;
+        double kp = 0.02;
+        double ki = 0;
+        double kd = 0;
 
         boolean isRed = false;
 
@@ -134,10 +134,9 @@ public class LinearTest extends LinearOpMode {
 
         // Start autonomous
         stateTimer.reset();
-
+        imu.reset();
         try {
-            imu.reset();
-            driveTrain.driveLinear(6, 6, 0, 0.5, isRed, imu, log);
+            driveTrain.driveLinear(6, 6, -45, 0.5, isRed, imu, log, kp, ki, kd);
             driveTrain.stopMotors();
         } catch (Exception e) {
             throw new RuntimeException(e);
