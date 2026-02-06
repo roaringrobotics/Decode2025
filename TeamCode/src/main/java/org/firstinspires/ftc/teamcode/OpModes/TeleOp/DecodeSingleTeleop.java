@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
 import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
 import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 
-@TeleOp(name = "Single Controller")
+@TeleOp(name = "Single Controller", group = "Test")
 public class DecodeSingleTeleop extends LinearOpMode {
     private DriveTrain driveTrain;
     private Shooter shooter;
@@ -33,8 +33,8 @@ public class DecodeSingleTeleop extends LinearOpMode {
         waitForStart();
         float deadZone = 0.5F;
         while (opModeIsActive()) {
-            double drive = -gamepad1.left_stick_y;
-            double strafe = gamepad1.left_stick_x;
+            double drive = gamepad1.left_stick_y;
+            double strafe = -gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
 
@@ -44,9 +44,9 @@ public class DecodeSingleTeleop extends LinearOpMode {
             timesource.update();
 
             if (gamepad1.dpad_down)
-                shooter.singleShoot(gamepad2.a, gamepad2.b, gamepad2.y);
+                shooter.singleShoot(gamepad1.a, gamepad1.b, gamepad1.y);
             else
-                shooter.continousShoot(gamepad2.a, gamepad2.b, gamepad2.y);
+                shooter.continousShoot(gamepad1.a, gamepad1.b, gamepad1.y);
 
             if (!gamepad1.a && !gamepad1.b && !gamepad1.y) {
 

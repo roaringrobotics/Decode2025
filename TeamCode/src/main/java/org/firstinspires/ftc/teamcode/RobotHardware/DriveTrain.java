@@ -304,11 +304,15 @@ public class DriveTrain {
                             double y,
                             double endDegrees,
                             double power,
+                            boolean isRed,
                             ImuPositionI imu,
                             LogI log) throws Exception {
         imu.update();
         Pose2D startPose = imu.getPose();
-
+        if (isRed) {
+            y = -y;
+            endDegrees = -endDegrees;
+        }
         // Calculate target pose in field coordinates
         Pose2D targetPose = new Pose2D(
                 DistanceUnit.INCH,
@@ -677,7 +681,7 @@ public class DriveTrain {
             log.d("DriveStrafe", "Complete. Traveled: " + distanceTraveled);
         }
     }
-    public double powerScaler(boolean halfSpeed, boolean quarterSpeed) {
+    public double powerScaler(boolean    halfSpeed, boolean quarterSpeed) {
         double powerScale;
         if (halfSpeed) {
             powerScale = 0.5;

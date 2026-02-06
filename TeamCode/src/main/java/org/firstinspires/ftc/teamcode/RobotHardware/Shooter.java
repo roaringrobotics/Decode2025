@@ -137,12 +137,6 @@ public class Shooter {
         }
     }
 
-    //public void toggleShootMotor() {
-    //if (shooterMotor.getPower() == 0.0) {
-    //  startShooterMotor();
-    //} else {
-    //  stopShooterMotor();
-    //}
     public void getShooterVelocity() {
         shooterMotor.getVelocity();
     }
@@ -200,7 +194,7 @@ public class Shooter {
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
                 ShooterState = ShooterState.SHOOTING;
                 startShootServos();
-                intake.startIntake(1.0);
+                startIntake();
             } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
                 startShooterMotor(targetVelocity);
                 stopShootServos();
@@ -225,7 +219,7 @@ public class Shooter {
             targetVelocity = velocityBuffer[2];
         }
 
-        if (allOff || ballsLaunched == 3 && !empty) {
+        if (allOff || ballsLaunched >= 1 && !empty) {
             if (allOff) {
                 ballsLaunched = 0;
                 // eventually we will add logic to detect if there are balls in the shooter
@@ -278,18 +272,15 @@ public class Shooter {
     }
 
     public void startIntake() {
-        if(ShooterState == ShooterState.IDLE)
-            intake.startIntake(1.0);
+            intake.startIntake(-1.0);
     }
 
     public void stopIntake() {
-        if(ShooterState == ShooterState.IDLE)
             intake.stopIntake();
     }
 
     public void reverseIntake() {
-        if(ShooterState == ShooterState.IDLE)
-            intake.startIntake(-1.0);
+            intake.startIntake(1.0);
     }
     public int getBallsLaunched() {
         return ballsLaunched;

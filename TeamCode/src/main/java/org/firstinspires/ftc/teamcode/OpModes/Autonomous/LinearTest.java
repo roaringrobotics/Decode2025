@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
   - helper methods to set/stop drive power
 */
 
-@Autonomous(name = "Linear Test")
+@Autonomous(name = "Linear Test", group = "Test")
 public class LinearTest extends LinearOpMode {
 
     private DriveTrain driveTrain;
@@ -56,6 +56,8 @@ public class LinearTest extends LinearOpMode {
         double ki = 0.0;
         double kd = 0.29;
 
+        boolean isRed = false;
+
 //        Through testing y's and x's are flipped
 //        instead of:
 //                y
@@ -77,7 +79,7 @@ public class LinearTest extends LinearOpMode {
         double h = 0;
         double targetDistance = 0;
         double mirrorField = 1;
-        String team = "Blue Side";
+        String team;
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         imu.reset();
@@ -89,9 +91,9 @@ public class LinearTest extends LinearOpMode {
             telemetry.addData("Hint", "Waiting for start - update sensors/vision here");
             telemetry.update();
             if (gamepad2.optionsWasPressed()) {
-                mirrorField = mirrorField * -1;
+                isRed = !isRed;
             }
-            if (mirrorField == -1) {
+            if (isRed) {
                 team = "Red Side";
             } else {
                 team = "Blue Side";
@@ -118,8 +120,11 @@ public class LinearTest extends LinearOpMode {
                 kp -= change;
             }
 
-            telemetry.addData("PID Values:", "kp: %.5f ki: %.5f kd: %.5f", kp, ki, kd);
-            telemetry.addData("PID Change:", change);
+
+
+            telemetry.addData("PID Values", "kp: %.5f ki: %.5f kd: %.5f", kp, ki, kd);
+            telemetry.addData("PID Change", change);
+            telemetry.addData("Side", team);
             idle();
         }
 
@@ -132,7 +137,7 @@ public class LinearTest extends LinearOpMode {
 
         try {
             imu.reset();
-            driveTrain.driveStrafe(20, 0.5, imu, log, kp, ki, kd);
+            driveTrain.driveLinear(6, 6, 0, 0.5, isRed, imu, log);
             driveTrain.stopMotors();
         } catch (Exception e) {
             throw new RuntimeException(e);
