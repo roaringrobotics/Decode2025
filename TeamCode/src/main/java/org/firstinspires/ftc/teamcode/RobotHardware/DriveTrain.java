@@ -307,6 +307,7 @@ public class DriveTrain {
                             boolean isRed,
                             ImuPositionI imu,
                             LogI log, double kp, double ki, double kd) throws Exception {
+        imu.reset();
         imu.update();
         Pose2D startPose = imu.getPose();
         if (isRed) {
@@ -343,7 +344,7 @@ public class DriveTrain {
             lastTime = now;
 
             Pose2D curPose = imu.getPose();
-            double curHeading = imu.getHeading(AngleUnit.DEGREES);
+            double curHeading = curPose.getHeading(AngleUnit.DEGREES);
 
             // Calculate remaining distance to target
             double deltaX = targetPose.getX(DistanceUnit.INCH) - curPose.getX(DistanceUnit.INCH);
@@ -391,6 +392,7 @@ public class DriveTrain {
             double rotatePower = 0.0;
             if (!headingOnTarget) {
                 rotatePower = rotatePID.calculate(endDegrees, curHeading);
+                rotatePower = -rotatePower;
 
                 // Apply minimum rotation power
                 if (Math.abs(rotatePower) < minRotatePower && Math.abs(headingError) > angleTolerance) {
@@ -405,18 +407,19 @@ public class DriveTrain {
             double robotY = driveX * Math.sin(-botHeadingRad) + driveY * Math.cos(-botHeadingRad);
 
             // Apply the mysterious 1.1 scaling factor for strafe (from your original code)
-            robotX = robotX * 1.1;
+            //robotX = robotX * 1.1;
 
             // Calculate mecanum wheel powers
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
-            double flPower = (robotY + robotX + rotatePower) / denom;
-            double blPower = -(robotY - robotX - rotatePower) / denom;
-            double frPower = -(robotY - robotX + rotatePower) / denom;
-            double brPower = (robotY + robotX - rotatePower) / denom;
+            double flPower = -(robotY + robotX - rotatePower) / denom;
+            double blPower = (robotY - robotX - rotatePower) / denom;
+            double frPower = (robotY - robotX + rotatePower) / denom;
+            double brPower = -(robotY + robotX + rotatePower) / denom;
 
             // Apply power limit and signs (matching your motor configuration)
+
             setFrontLeftPower(flPower * power);
             setBackLeftPower(blPower * power);
             setFrontRightPower(frPower * power);
@@ -429,8 +432,8 @@ public class DriveTrain {
             fcPowerLevels.backRightPower = -(rotatedY + rotatedX + rotate) / denom;
              */
             if (log != null) {
-                log.d("DriveLinear", String.format("Dist: %.2f Angle: %.1f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, SC: %d",
-                        remainingDistance, headingError, flPower, frPower, blPower, brPower, settleCount));
+                log.d("DriveLinear", String.format("Dist: %.2f Angle: %.1f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, H: %.3f",
+                        remainingDistance, headingError, flPower, frPower, blPower, brPower, curHeading));
             }
 
             sleep(20);

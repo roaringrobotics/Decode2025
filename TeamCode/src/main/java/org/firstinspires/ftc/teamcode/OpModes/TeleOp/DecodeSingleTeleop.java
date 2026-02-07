@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
@@ -37,6 +38,8 @@ public class DecodeSingleTeleop extends LinearOpMode {
             double strafe = -gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
+            hw.imuPos.update();
+            log.d("Heading: ", String.valueOf(hw.imuPos.getHeading(AngleUnit.DEGREES)));
 
 
             driveTrain.driveFieldCentric(drive, strafe, rotate, powerScale, hw);

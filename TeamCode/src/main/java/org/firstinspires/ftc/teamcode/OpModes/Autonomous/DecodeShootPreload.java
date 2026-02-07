@@ -75,6 +75,7 @@ public class DecodeShootPreload extends LinearOpMode {
         double h = 0;
         double mirrorField = 1;
         String team;
+        double rows = 0;
         double targetDistance;
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -94,6 +95,12 @@ public class DecodeShootPreload extends LinearOpMode {
                 team = "Blue Side";
             }
             telemetry.addData("Side", team);
+            if (gamepad2.dpad_up) {
+                rows = (rows + 1) % 4;
+            } else if (gamepad2.dpad_down) {
+                rows = (rows - 1) % 4;
+            }
+            telemetry.addData("Rows", rows);
         }
 
         if (isStopRequested()) {

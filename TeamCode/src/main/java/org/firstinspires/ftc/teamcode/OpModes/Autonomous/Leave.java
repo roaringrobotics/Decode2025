@@ -106,9 +106,9 @@ public class Leave extends LinearOpMode {
         stateTimer.reset();
 
         try {
-            driveTrain.driveStraight(4, 0.3, imu, log, 0.045, 0, 0);
+            driveTrain.driveStraight(-4, 0.3, imu, log, 0.045, 0, 0);
             driveTrain.rotateRelative(-90 * mirrorField, imu, log);
-            driveTrain.driveStraight(-18, 0.4, imu, log, 0.045, 0, 0);
+            driveTrain.driveStraight(18, 0.4, imu, log, 0.045, 0, 0);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

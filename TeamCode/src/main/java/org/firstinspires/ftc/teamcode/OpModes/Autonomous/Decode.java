@@ -169,7 +169,7 @@ public class Decode extends LinearOpMode {
         try {
             // This comment is helpful
             shooter.startShooterMotor(0.6);
-            driveTrain.driveStraight(72, 0.8, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(-72, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(45 * mirrorField, imu, log);
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
@@ -180,10 +180,10 @@ public class Decode extends LinearOpMode {
             sleep(1);
             driveTrain.rotateRelative(-135 * mirrorField, imu, log);
             shooter.startIntake();
-            driveTrain.driveStraight(-36, 0.4, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(36, 0.4, imu, log, kp, ki, kd);
             shooter.resetShooter();
             sleep(1);
-            driveTrain.driveStraight(36, 0.8, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(-36, 0.8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(135 * mirrorField, imu, log);
 
             stateTimer.reset();
@@ -195,9 +195,9 @@ public class Decode extends LinearOpMode {
             driveTrain.rotateRelative(-135 * mirrorField, imu, log);
             driveTrain.driveStrafe(24 * mirrorField, 0.7, imu, log, kps, ki, kds);
             shooter.startIntake();
-            driveTrain.driveStraight(-40, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(40, 0.6, imu, log, kp, ki, kd);
             shooter.resetShooter();
-            driveTrain.driveStraight(4, 0.6, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(-4, 0.6, imu, log, kp, ki, kd);
 
 
         } catch (Exception e) {

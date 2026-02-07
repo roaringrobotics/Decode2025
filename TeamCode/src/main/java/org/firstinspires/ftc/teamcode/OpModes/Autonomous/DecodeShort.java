@@ -78,6 +78,7 @@ public class DecodeShort extends LinearOpMode {
         double targetDistance = 0;
         double mirrorField = 1;
         String team = "Blue Side";
+        int rows = 0;
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         imu.reset();
@@ -96,6 +97,12 @@ public class DecodeShort extends LinearOpMode {
                 team = "Blue Side";
             }
             telemetry.addData("Side", team);
+            if (gamepad2.dpadUpWasPressed()) {
+                rows = (rows + 1) % 4;
+            } else if (gamepad2.dpadDownWasPressed()) {
+                rows = (rows - 1) % 4;
+            }
+            telemetry.addData("Rows", rows);
             idle();
         }
 
@@ -113,21 +120,23 @@ public class DecodeShort extends LinearOpMode {
 
         // Start autonomous
         try {
-            driveTrain.driveStraight(6, .5, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(25 * mirrorField, imu, log);
+            driveTrain.driveStraight(-6, .5, imu, log, kp, ki, kd);
+            driveTrain.rotateRelative(23 * mirrorField, imu, log);
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
                 shooter.continousShoot(false, false, true);
             }
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < rows; i++) {
                 shooter.resetShooter();
-                driveTrain.rotateRelative(-115 * mirrorField, imu, log);
-                driveTrain.driveStrafe(-20, .7, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative(-113 * mirrorField, imu, log);
+                driveTrain.driveStrafe(-20 - i * 20, .8, imu, log, kps, ki, kds);
                 shooter.startIntake();
-                driveTrain.driveStraight(-30, .5, imu, log, kp, ki, kd);
+                driveTrain.driveStraight(40, .5, imu, log, kp, ki, kd);
                 shooter.stopIntake();
-                driveTrain.driveStraight(30, .8, imu, log, kp, ki, kd);
-                driveTrain.rotateRelative(115 * mirrorField, imu, log);
+                driveTrain.driveStraight(-40, .8, imu, log, kp, ki, kd);
+                driveTrain.rotateRelative(90 * mirrorField, imu, log);
+                driveTrain.driveStraight(15 + i * 20, .8, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative(23 * mirrorField, imu, log);
                 stateTimer.reset();
                 shooter.resetShooter();
                 while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
@@ -138,9 +147,9 @@ public class DecodeShort extends LinearOpMode {
                         shooter.continousShoot(false, true, false);
                 }
                 }
-                if(i == 2) {
+                if(i >= 2) {
                     while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
-                        shooter.continousShoot(true, false, false);
+                        shooter.continousShoot(false, true, false);
                     }
                 }
             }
