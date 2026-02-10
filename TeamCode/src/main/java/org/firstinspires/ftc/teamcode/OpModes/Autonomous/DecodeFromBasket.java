@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
   - helper methods to set/stop drive power
 */
 
-@Autonomous(name = "DecodeFromBasket", group = "Autonomous")
+@Autonomous(name = "From Basket")
 public class DecodeFromBasket extends LinearOpMode {
 
     private DriveTrain driveTrain;
@@ -75,7 +75,7 @@ public class DecodeFromBasket extends LinearOpMode {
         double h = 0;
         double mirrorField = 1;
         String team;
-        double targetDistance;
+        int rows = 0;
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         imu.reset();
@@ -94,6 +94,13 @@ public class DecodeFromBasket extends LinearOpMode {
                 team = "Blue Side";
             }
             telemetry.addData("Side", team);
+            if (gamepad2.dpadUpWasPressed()) {
+                rows++;
+            } else if (gamepad2.dpadDownWasPressed()) {
+                rows--;
+            }
+            rows = rows % 4;
+            telemetry.addData("Rows", rows);
         }
 
         if (isStopRequested()) {
@@ -121,29 +128,42 @@ public class DecodeFromBasket extends LinearOpMode {
             }
             shooter.resetShooter();
             sleep(1);
+            if (rows == 0) {
+                driveTrain.rotateRelative(-142 * mirrorField, imu, log);
+                driveTrain.driveStrafe(-42, 0.5, imu, log, kps, ki, kds);
+            }
+            for (int i = 0; i < rows; i++) {
 
-            driveTrain.driveStrafe(-13 * mirrorField, 0.8, imu, log, kps, ki, kds);
-            driveTrain.rotateRelative(-142 * mirrorField, imu, log);
-            shooter.startIntake();
-            shooter.startShooterMotor(1000);
-            driveTrain.driveStraight(38, 0.4, imu, log, kp, ki, kd);
-            shooter.resetShooter();
-            sleep(1);
-            driveTrain.driveStraight(-38, 0.8, imu, log, kp, ki, kd);
-            driveTrain.rotateRelative(138 * mirrorField, imu, log);
 
-            stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2500) {
+
+                if (i == 0)
+                    driveTrain.driveStrafe(-5 * mirrorField, 0.8, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative(-138 * mirrorField, imu, log);
+                driveTrain.driveStrafe(25 * i * mirrorField, 0.8, imu, log, kps, ki, kds);
+                shooter.startIntake();
+                shooter.startShooterMotor(1000);
+                driveTrain.driveStraight(36 + i * 3, 0.4, imu, log, kp, ki, kd);
+                shooter.resetShooter();
+                sleep(1);
+                driveTrain.driveStraight(-36 + i * 3, 0.8, imu, log, kp, ki, kd);
+                driveTrain.driveStrafe(-25 * i * mirrorField, 0.8, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative(138 * mirrorField, imu, log);
+                shooter.resetShooter();
+
+                stateTimer.reset();
+                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2500) {
                 shooter.continousShoot(false, true, false);
                 sleep(5);
+                }
+                shooter.resetShooter();
             }
-            shooter.resetShooter();
-            driveTrain.rotateRelative(-138 * mirrorField, imu, log);
-            driveTrain.driveStrafe(25 * mirrorField, 0.8, imu, log, kps, ki, kds);
-            shooter.startIntake();
-            driveTrain.driveStraight(40, 0.6, imu, log, kp, ki, kd);
-            shooter.resetShooter();
-            driveTrain.driveStraight(-4, 0.4, imu, log, kp, ki, kd);
+//            shooter.resetShooter();
+//            driveTrain.rotateRelative(-138 * mirrorField, imu, log);
+//            driveTrain.driveStrafe(25 * mirrorField, 0.8, imu, log, kps, ki, kds);
+//            shooter.startIntake();
+//            driveTrain.driveStraight(40, 0.6, imu, log, kp, ki, kd);
+//            shooter.resetShooter();
+//            driveTrain.driveStraight(-4, 0.4, imu, log, kp, ki, kd);
 //            driveTrain.driveStrafe(-24, 0.8, imu, log, kps, ki, kds);
 //            driveTrain.rotateRelative(138 * mirrorField, imu, log);
 //

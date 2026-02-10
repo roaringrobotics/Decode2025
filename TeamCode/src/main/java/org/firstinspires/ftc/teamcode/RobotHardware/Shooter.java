@@ -164,9 +164,9 @@ public class Shooter {
 
             }
 
-            stopShooterMotor();
-            stopShootServos();
-            intake.stopIntake();
+              stopShooterMotor();
+//            stopShootServos();
+//            intake.stopIntake();
             ShooterState = ShooterState.IDLE;
 
         } else if (anyOn) {
@@ -258,6 +258,7 @@ public class Shooter {
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
                 ShooterState = ShooterState.SHOOTING;
                 startShootServos();
+                startShooterMotor(targetVelocity);
             } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
                 startShooterMotor(targetVelocity);
                 stopShootServos();
