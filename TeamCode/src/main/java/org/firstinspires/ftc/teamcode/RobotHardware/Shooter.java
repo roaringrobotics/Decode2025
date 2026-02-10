@@ -21,7 +21,6 @@ public class Shooter {
     public AndroidLog log;
 
 
-
     int ballsLaunched = 0;
     boolean empty = false;
 
@@ -142,7 +141,6 @@ public class Shooter {
         shooterMotor.getVelocity();
     }
 
-
     public void continousShoot(boolean buttonShort, boolean buttonMid, boolean buttonLong) {
         boolean allOff = !buttonShort && !buttonMid && !buttonLong;
         boolean anyOn = buttonShort || buttonMid || buttonLong;
@@ -165,7 +163,10 @@ public class Shooter {
                 empty = true;
 
             }
-            resetShooter();
+
+              stopShooterMotor();
+//            stopShootServos();
+//            intake.stopIntake();
             ShooterState = ShooterState.IDLE;
 
         } else if (anyOn) {
@@ -188,17 +189,14 @@ public class Shooter {
                 }
 
                 startShooterMotor(targetVelocity);
-
+               //
             }
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
                 ShooterState = ShooterState.SHOOTING;
                 startShootServos();
-                startShooterMotor(targetVelocity);
                 startIntake();
-
             } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
                 startShooterMotor(targetVelocity);
-                stopIntake();
                 stopShootServos();
                 lastShooterState = ShooterState.SHOOTING;
                 ShooterState = ShooterState.SPINNING_UP;
@@ -231,7 +229,8 @@ public class Shooter {
 
             }
 
-            resetShooter();
+            stopShooterMotor();
+            stopShootServos();
             ShooterState = ShooterState.IDLE;
 
         } else if (anyOn) {
