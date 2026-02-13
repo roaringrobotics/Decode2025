@@ -230,20 +230,24 @@ public class Shooter {
 
 
                 // Check settle condition
-                int lowerEnd = (targetVelocity - settleError);
-                int upperEnd = (targetVelocity + settleError);
-                dashboardTelemetry.addData("Settle Count", settleCount);
-                if (currentVel > lowerEnd && currentVel < upperEnd) {
-                    settleCount++;
-                    if (settleCount >= settleCountRequired) {
-                        ShooterState = ShooterState.SHOOTING;
-                        startShootServos();
-                        startIntake();
-                    }
-                } else {
-                    settleCount = 0;
-                }
-                //startShooterMotor(targetVelocity);
+//                int lowerEnd = (targetVelocity - settleError);
+//                int upperEnd = (targetVelocity + settleError);
+//                dashboardTelemetry.addData("Settle Count", settleCount);
+//                if (currentVel > lowerEnd && currentVel < upperEnd) {
+//                    settleCount++;
+//                    if (settleCount >= settleCountRequired) {
+//                        ShooterState = ShooterState.SHOOTING;
+//                        startShootServos();
+//                        startIntake();
+//                    }
+//                } else {
+//                    settleCount = 0;
+//                }
+
+                ShooterState = ShooterState.SHOOTING;
+                startShootServos();
+                startIntake();
+                startShooterMotor(targetVelocity);
 
 
             } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
