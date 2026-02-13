@@ -213,7 +213,7 @@ public class DriveTrain {
         PID pid = new PID(kP, kI, kD);
         final double distanceTolerance = 0.25; // inches
         final double minDrivePower = 0.15;     // minimum drive power to overcome static friction
-        final int settleCountsRequired = 10;
+        final int settleCountsRequired = 5;
 
         // Small PD for heading correction
         final double headingKp = 0.02;
@@ -332,7 +332,7 @@ public class DriveTrain {
         final double angleTolerance = 2.0;     // degrees
         final double minDrivePower = 0.12;
         final double minRotatePower = 0.15;
-        final int settleCountsRequired = 10;
+        final int settleCountsRequired = 5;
 
         int settleCount = 0;
         long lastTime = System.nanoTime();
@@ -603,7 +603,7 @@ public class DriveTrain {
         PID pid = new PID(kP, kI, kD);
         final double distanceTolerance = 0.25; // inches
         final double minDrivePower = 0.15;     // minimum drive power to overcome static friction
-        final int settleCountsRequired = 10;
+        final int settleCountsRequired = 5;
 
         // Small PD for heading correction
         final double headingKp = 0.02;
