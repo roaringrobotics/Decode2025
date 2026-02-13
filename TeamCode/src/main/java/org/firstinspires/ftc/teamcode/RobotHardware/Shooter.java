@@ -172,6 +172,7 @@ public class Shooter {
         // Continuously update voltage reading
         double voltage = 0.0;
         double v = voltSensor.getVoltage();
+        int settleError = 100;
         dashboardTelemetry.addData("Voltage", v);
         int targetVelocity = 0;
         if(buttonShort) {
@@ -229,8 +230,8 @@ public class Shooter {
 
 
                 // Check settle condition
-                int lowerEnd = (targetVelocity - allowedError);
-                int upperEnd = (targetVelocity + allowedError);
+                int lowerEnd = (targetVelocity - settleError);
+                int upperEnd = (targetVelocity + settleError);
                 dashboardTelemetry.addData("Settle Count", settleCount);
                 if (currentVel > lowerEnd && currentVel < upperEnd) {
                     settleCount++;
