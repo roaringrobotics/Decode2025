@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.RobotHardware;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 
@@ -16,10 +20,10 @@ public class Shooter {
     public long lastTime;
     public double lastVelocity;
     private double[] velocityBuffer = {(1000), (1100), (1345)};
-    private double allowedError = 50.0;
+    private double allowedError = 200.0;
     private Intake intake;
     public AndroidLog log;
-
+    VoltageSensor voltSensor;
 
 
     int ballsLaunched = 0;
@@ -32,6 +36,9 @@ public class Shooter {
     }
     private ShooterState ShooterState;
     private ShooterState lastShooterState;
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
 
     public Shooter(HardwareMap hardwareMap, Intake in, AndroidLog logIn) {
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
@@ -39,7 +46,15 @@ public class Shooter {
         ShooterState = ShooterState.IDLE;
         log = logIn;
 
-
+        double voltage = 0.0;
+        for (VoltageSensor sensor : hardwareMap.getAll(VoltageSensor.class)) {
+            double v = sensor.getVoltage();
+            if (v > 0) {
+                voltage = v;
+                voltSensor = sensor;
+                break;
+            }
+        }
 
         // Initialize servos (use hardware names configured in your robot config)
         blueServo = hardwareMap.get(CRServo.class, "blueServo");
@@ -153,6 +168,10 @@ public class Shooter {
         boolean allOff = !buttonShort && !buttonMid && !buttonLong;
         boolean anyOn = buttonShort || buttonMid || buttonLong;
 
+        // Continuously update voltage reading
+        double voltage = 0.0;
+        double v = voltSensor.getVoltage();
+        dashboardTelemetry.addData("Voltage", v);
         double targetVelocity = 0.0;
         if(buttonShort) {
             targetVelocity = velocityBuffer[0];
@@ -162,7 +181,7 @@ public class Shooter {
             targetVelocity = velocityBuffer[2];
         }
 
-        if (allOff || ballsLaunched >= 1 && !empty) {
+        if (allOff || ballsLaunched >= 3 && !empty) {
             if (allOff) {
                 ballsLaunched = 0;
                 // eventually we will add logic to detect if there are balls in the shooter
@@ -173,23 +192,21 @@ public class Shooter {
             }
 
 
-            stopShooterMotor();
-            stopShootServos();
-            intake.stopIntake();
-
             resetShooter();
-
+            //log.d("Shooter", "Setting State: " + ShooterState);
             ShooterState = ShooterState.IDLE;
 
         } else if (anyOn) {
             double currentVel = shooterMotor.getVelocity();
             double currentVelDeg = shooterMotor.getVelocity(AngleUnit.DEGREES);
-            log.d("Shooter", "-----------------------------------");
-            log.d("Shooter", "Velocity (rag): " + currentVel);
-            log.d("Shooter", "Velocity (deg): " + currentVelDeg);
-            log.d("Shooter", "Target Velocity: " + targetVelocity);
-            log.d("Shooter", "State: " + ShooterState.toString());
-            log.d("Shooter", "Balls Launched: " + ballsLaunched);
+            dashboardTelemetry.addData("vel", currentVel);
+            dashboardTelemetry.update();
+//            log.d("Shooter", "-----------------------------------");
+//            log.d("Shooter", "Velocity (rag): " + currentVel);
+//            log.d("Shooter", "Velocity (deg): " + currentVelDeg);
+//            log.d("Shooter", "Target Velocity: " + targetVelocity);
+//            log.d("Shooter", "State: " + ShooterState.toString());
+//            log.d("Shooter", "Balls Launched: " + ballsLaunched);
             if(ShooterState == ShooterState.IDLE) {
                 startShooterMotor(targetVelocity);
                 ShooterState = ShooterState.SPINNING_UP;
@@ -197,6 +214,9 @@ public class Shooter {
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) > allowedError) {
                 if (lastShooterState == ShooterState.SHOOTING) {
                     ballsLaunched++;
+                    log.d("Shooter", "Balls Launched: " + ballsLaunched);
+                    log.d("Shooter", "Target: " + targetVelocity);
+                    log.d("Shooter", "Current Velocity: " + currentVel);
                     lastShooterState = ShooterState.SPINNING_UP;
                 }
 
@@ -207,7 +227,7 @@ public class Shooter {
                 ShooterState = ShooterState.SHOOTING;
                 startShootServos();
 
-                intake.startIntake(1.0);
+                startIntake();
 
                 startShooterMotor(targetVelocity);
                 startIntake();
@@ -290,19 +310,17 @@ public class Shooter {
     }
 
     public void startIntake() {
-        if(ShooterState == ShooterState.IDLE)
-            intake.startIntake(-1.0);
+            intake.startIntake();
     }
 
     public void stopIntake() {
-        if(ShooterState == ShooterState.IDLE)
             intake.stopIntake();
     }
 
     public void reverseIntake() {
-        if(ShooterState == ShooterState.IDLE)
-            intake.startIntake(1.0);
+            intake.reverseIntake();
     }
+
     public int getBallsLaunched() {
         return ballsLaunched;
     }

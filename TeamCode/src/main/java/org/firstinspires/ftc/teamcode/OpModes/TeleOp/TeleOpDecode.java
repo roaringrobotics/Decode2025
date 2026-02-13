@@ -33,7 +33,7 @@ public class TeleOpDecode extends LinearOpMode {
         waitForStart();
         float deadZone = 0.5F;
         while (opModeIsActive()) {
-            double drive = gamepad1.left_stick_y;
+            double drive = -gamepad1.left_stick_y;
             double strafe = -gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);

@@ -34,12 +34,12 @@ public class DecodeSingleTeleop extends LinearOpMode {
         waitForStart();
         float deadZone = 0.5F;
         while (opModeIsActive()) {
-            double drive = gamepad1.left_stick_y;
-            double strafe = -gamepad1.left_stick_x;
+            double drive = -gamepad1.left_stick_y;
+            double strafe = gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
             hw.imuPos.update();
-            log.d("Heading: ", String.valueOf(hw.imuPos.getHeading(AngleUnit.DEGREES)));
+//            log.d("Heading: ", String.valueOf(hw.imuPos.getHeading(AngleUnit.DEGREES)));
 
 
             driveTrain.driveFieldCentric(drive, strafe, rotate, powerScale, hw);

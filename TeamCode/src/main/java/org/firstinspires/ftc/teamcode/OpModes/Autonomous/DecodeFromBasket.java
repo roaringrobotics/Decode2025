@@ -117,10 +117,11 @@ public class DecodeFromBasket extends LinearOpMode {
         try {
             shooter.startShooterMotor(1000);
             driveTrain.driveStraight(55, 0.8, imu, log, kp, ki, kd);
+//            driveTrain.rotateRelative(-138 * mirrorField, imu, log);
 
             stateTimer.reset();
 
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
                 shooter.continousShoot(false, true, false);
 //                log.d("Shooter", "Timer: " + stateTimer.milliseconds());
 //                sleep(5);
@@ -132,7 +133,7 @@ public class DecodeFromBasket extends LinearOpMode {
 
 
                 if (i == 0) {
-                    driveTrain.driveStrafe(-5 * mirrorField, 0.8, imu, log, kps, ki, kds);
+                    driveTrain.driveStrafe(-9 * mirrorField, 0.8, imu, log, kps, ki, kds);
                 }
                 driveTrain.rotateRelative(-138 * mirrorField, imu, log);
                 driveTrain.driveStrafe(25 * i * mirrorField, 0.8, imu, log, kps, ki, kds);
@@ -142,23 +143,24 @@ public class DecodeFromBasket extends LinearOpMode {
                 sleep(500);
                 shooter.resetShooter();
                 sleep(1);
-                shooter.startShooterMotor(1100);
+                shooter.startShooterMotor(1000);
                 driveTrain.driveStraight(-37 + i * 3, 0.8, imu, log, kp, ki, kd);
-                shooter.startShooterMotor(1100);
+                shooter.startShooterMotor(1000);
                 driveTrain.driveStrafe(-25 * i * mirrorField, 0.8, imu, log, kps, ki, kds);
-                shooter.startShooterMotor(1100);
+                shooter.startShooterMotor(1000);
                 driveTrain.rotateRelative(138 * mirrorField, imu, log);
                 shooter.startShooterMotor(1100);
 
                 stateTimer.reset();
-                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 3000) {
+                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
+                    sleep(20);
                     shooter.continousShoot(false, true, false);
 //                    sleep(5);
                 }
                 shooter.resetShooter();
             }
             driveTrain.rotateRelative(-142 * mirrorField, imu, log);
-            driveTrain.driveStrafe(-42, 0.5, imu, log, kps, ki, kds);
+            driveTrain.driveStrafe(-38, 0.5, imu, log, kps, ki, kds);
 /*            shooter.resetShooter();
             driveTrain.rotateRelative(-138 * mirrorField, imu, log);
             driveTrain.driveStrafe(25 * mirrorField, 0.8, imu, log, kps, ki, kds);

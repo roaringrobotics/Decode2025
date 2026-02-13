@@ -43,7 +43,7 @@ public class VelocitySysTest extends OpMode {
             shooter.stopFeed();
         }
         if (gamepad1.right_trigger > 0.5) {
-            intake.startIntake(1);
+            intake.startIntake();
         } else {
             intake.stopIntake();
         }

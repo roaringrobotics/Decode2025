@@ -21,7 +21,6 @@ public class Intake {
         // Default configuration: no direction reversal here (change if needed)
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setPower(double power) {
@@ -48,8 +47,8 @@ public class Intake {
         motor.setMode(mode);
     }
 
-    public void startIntake(double power) {
-        setPower(-power);
+    public void startIntake() {
+        setPower(-1.0);
     }
     public void stopIntake() {
         setPower(0.0);
