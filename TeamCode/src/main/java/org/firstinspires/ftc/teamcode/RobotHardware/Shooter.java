@@ -19,8 +19,8 @@ public class Shooter {
     public final CRServo blackServo;
     public long lastTime;
     public double lastVelocity;
-    private double[] velocityBuffer = {(1000), (1100), (1345)};
-    private double allowedError = 200.0;
+    private int[] velocityBuffer = {(1000), (1100), (1345)};
+    private int allowedError = 200;
     private Intake intake;
     public AndroidLog log;
     VoltageSensor voltSensor;
@@ -163,7 +163,8 @@ public class Shooter {
         shooterMotor.getVelocity();
     }
 
-
+    int settleCountRequired = 15;
+    int settleCount = 0;
     public void continousShoot(boolean buttonShort, boolean buttonMid, boolean buttonLong) {
         boolean allOff = !buttonShort && !buttonMid && !buttonLong;
         boolean anyOn = buttonShort || buttonMid || buttonLong;
@@ -172,7 +173,7 @@ public class Shooter {
         double voltage = 0.0;
         double v = voltSensor.getVoltage();
         dashboardTelemetry.addData("Voltage", v);
-        double targetVelocity = 0.0;
+        int targetVelocity = 0;
         if(buttonShort) {
             targetVelocity = velocityBuffer[0];
         } else if (buttonMid) {
@@ -182,6 +183,7 @@ public class Shooter {
         }
 
         if (allOff || ballsLaunched >= 3 && !empty) {
+            settleCount = 0;
             if (allOff) {
                 ballsLaunched = 0;
                 // eventually we will add logic to detect if there are balls in the shooter
@@ -219,29 +221,37 @@ public class Shooter {
                     log.d("Shooter", "Current Velocity: " + currentVel);
                     lastShooterState = ShooterState.SPINNING_UP;
                 }
-
+                settleCount = 0;
                 startShooterMotor(targetVelocity);
 
             }
             else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
-                ShooterState = ShooterState.SHOOTING;
-                startShootServos();
 
-                startIntake();
 
-                startShooterMotor(targetVelocity);
-                startIntake();
+                // Check settle condition
+                int lowerEnd = (targetVelocity - allowedError);
+                int upperEnd = (targetVelocity + allowedError);
+                dashboardTelemetry.addData("Settle Count", settleCount);
+                if (currentVel > lowerEnd && currentVel < upperEnd) {
+                    settleCount++;
+                    if (settleCount >= settleCountRequired) {
+                        ShooterState = ShooterState.SHOOTING;
+                        startShootServos();
+                        startIntake();
+                    }
+                } else {
+                    settleCount = 0;
+                }
+                //startShooterMotor(targetVelocity);
 
 
             } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
                 startShooterMotor(targetVelocity);
                 stopIntake();
                 stopShootServos();
+                settleCount = 0;
                 lastShooterState = ShooterState.SHOOTING;
                 ShooterState = ShooterState.SPINNING_UP;
-
-
-
             }
         }
     }

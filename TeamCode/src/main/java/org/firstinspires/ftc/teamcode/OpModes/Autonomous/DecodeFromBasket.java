@@ -155,7 +155,6 @@ public class DecodeFromBasket extends LinearOpMode {
                 while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
                     sleep(20);
                     shooter.continousShoot(false, true, false);
-//                    sleep(5);
                 }
                 shooter.resetShooter();
             }
