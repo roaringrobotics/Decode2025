@@ -176,8 +176,8 @@ public class DriveTrain {
         // h = botHeading
         // strafe = left stick x value
         // drive = left stick y value.
-        double rotatedStrafe = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
-        double rotatedDrive = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
+        double rotatedStrafe = -strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
+        double rotatedDrive = -strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
 
         // Don't know why the rotated value of left stick x is scale by 1.1.
         // It's not in online example code.
