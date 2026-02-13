@@ -155,10 +155,9 @@ public class DriveTrain {
 //        log.d("PathController", String.format("br: %f", fcPowerLevels.backRightPower));
 //        log.d("PathController", "===========================================");
 
-        // The power scale has to be negative for two of them because their problematic
         frontLeft.setPower(fcPowerLevels.frontLeftPower * powerScale);
-        backLeft.setPower(fcPowerLevels.backLeftPower * -powerScale);
-        frontRight.setPower(fcPowerLevels.frontRightPower * -powerScale);
+        backLeft.setPower(fcPowerLevels.backLeftPower * powerScale);
+        frontRight.setPower(fcPowerLevels.frontRightPower * powerScale);
         backRight.setPower(fcPowerLevels.backRightPower * powerScale);
     }
     private void getFieldCentricPowerLevels(
@@ -172,31 +171,30 @@ public class DriveTrain {
         // Rotate joystick input vectors for field centric control.
 
         // Apply rotation matrix inverse of botHeading (-botHeading).
-        // | cos(-h) -sin(-h) | | lsx  lsy |
-        // | sin(-h)  cos(-h) | | lsx  lsy |
+        // | cos(-h) -sin(-h) | | drive |
+        // | sin(-h)  cos(-h) | | strafe|
         // h = botHeading
-        // lsx = left stick x value
-        // lsy = left stick y value.
-        double rotatedX = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
-        double rotatedY = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
+        // strafe = left stick x value
+        // drive = left stick y value.
+        double rotatedStrafe = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
+        double rotatedDrive = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
 
         // Don't know why the rotated value of left stick x is scale by 1.1.
         // It's not in online example code.
-        rotatedX = rotatedX * 1.1;
+        //rotatedX = rotatedX * 1.1;
 
         // Normalize output power [-1.0-1.0]
-        double vectorSum = Math.abs(rotatedY) + Math.abs(rotatedX) + Math.abs(rotate);
+        double vectorSum = Math.abs(rotatedDrive) + Math.abs(rotatedStrafe) + Math.abs(rotate);
         double denom = Math.max(vectorSum, 1.0);
 
         // Set normalized field centric power levels.
-        fcPowerLevels.frontLeftPower = -(rotatedY + rotatedX - rotate) / denom;
-        fcPowerLevels.backLeftPower = (rotatedY - rotatedX - rotate) / denom;
-        fcPowerLevels.frontRightPower = (rotatedY - rotatedX + rotate) / denom;
-        fcPowerLevels.backRightPower = -(rotatedY + rotatedX + rotate) / denom;
+        fcPowerLevels.frontLeftPower = (-rotatedStrafe + rotatedDrive + rotate) / denom;
+        fcPowerLevels.backLeftPower = (rotatedStrafe + rotatedDrive + rotate) / denom;
+        fcPowerLevels.frontRightPower = (rotatedStrafe + rotatedDrive - rotate) / denom;
+        fcPowerLevels.backRightPower = (-rotatedStrafe + rotatedDrive - rotate) / denom;
     }
 
     // Class to hold field centric power level output from getFieldCentricPowerLevels
-// java
     public void driveStraight(double distance, double power, ImuPositionI imu, LogI log,
                               double kP, double kI, double kD) throws Exception {
         imu.update();
@@ -402,21 +400,23 @@ public class DriveTrain {
 
             // Convert field-centric to robot-centric
             // Rotate drive vector by -botHeading to get robot-relative motion
+            // driveY is strafe, driveX is forward, so we swap them in the rotation matrix
+            // This is defined by the pinpoint odometry computer
             double botHeadingRad = Math.toRadians(curHeading);
             double robotX = driveX * Math.cos(-botHeadingRad) - driveY * Math.sin(-botHeadingRad);
             double robotY = driveX * Math.sin(-botHeadingRad) + driveY * Math.cos(-botHeadingRad);
 
             // Apply the mysterious 1.1 scaling factor for strafe (from your original code)
-            //robotX = robotX * 1.1;
+            // robotX = robotX * 1.1;
 
             // Calculate mecanum wheel powers
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
-            double flPower = -(robotY + robotX - rotatePower) / denom;
-            double blPower = (robotY - robotX - rotatePower) / denom;
-            double frPower = (robotY - robotX + rotatePower) / denom;
-            double brPower = -(robotY + robotX + rotatePower) / denom;
+            double flPower = (robotY + robotX + rotatePower) / denom;
+            double blPower = (-robotY + robotX + rotatePower) / denom;
+            double frPower = (-robotY + robotX - rotatePower) / denom;
+            double brPower = (robotY + robotX - rotatePower) / denom;
 
             // Apply power limit and signs (matching your motor configuration)
 
