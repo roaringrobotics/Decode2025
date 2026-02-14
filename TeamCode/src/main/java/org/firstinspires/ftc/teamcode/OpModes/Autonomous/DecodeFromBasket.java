@@ -133,44 +133,28 @@ public class DecodeFromBasket extends LinearOpMode {
 
 
                 if (i == 0) {
-                    driveTrain.driveStrafe(-9 * mirrorField, 0.8, imu, log, kps, ki, kds);
+                    driveTrain.driveStrafe(-11 * mirrorField, 0.9, imu, log, kps, ki, kds);
                 }
-                driveTrain.rotateRelative(-138 * mirrorField, imu, log);
-                driveTrain.driveStrafe(25 * i * mirrorField, 0.8, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative(-140 * mirrorField, imu, log);
+                driveTrain.driveStrafe(25 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 shooter.startIntake();
-                driveTrain.driveStraight(37 + i * 3, 0.4, imu, log, kp, ki, kd);
+                driveTrain.driveStraight(38 + i * 3, 0.4, imu, log, kp, ki, kd);
 
-                sleep(500);
+                // keep the intake running for a bit to ensure we get the balls in
+                sleep(300);
                 shooter.resetShooter();
-                sleep(1);
-                shooter.startShooterMotor(1000);
-                driveTrain.driveStraight(-37 + i * 3, 0.8, imu, log, kp, ki, kd);
-                shooter.startShooterMotor(1000);
-                driveTrain.driveStrafe(-25 * i * mirrorField, 0.8, imu, log, kps, ki, kds);
-                shooter.startShooterMotor(1000);
-                driveTrain.rotateRelative(138 * mirrorField, imu, log);
-                shooter.startShooterMotor(1100);
+                driveTrain.driveStraight(-38 + i * 3, 0.9, imu, log, kp, ki, kd);
+                driveTrain.driveStrafe(-25 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative(140 * mirrorField, imu, log);
 
                 stateTimer.reset();
-                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
-                    sleep(20);
+                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750 - i * 150) {
                     shooter.continousShoot(false, true, false);
                 }
                 shooter.resetShooter();
             }
-            driveTrain.rotateRelative(-142 * mirrorField, imu, log);
-            driveTrain.driveStrafe(-38, 0.5, imu, log, kps, ki, kds);
-/*            shooter.resetShooter();
-            driveTrain.rotateRelative(-138 * mirrorField, imu, log);
-            driveTrain.driveStrafe(25 * mirrorField, 0.8, imu, log, kps, ki, kds);
-            shooter.startIntake();
-            driveTrain.driveStraight(40, 0.6, imu, log, kp, ki, kd);
-            shooter.resetShooter();
-            driveTrain.driveStraight(-4, 0.4, imu, log, kp, ki, kd);
-            driveTrain.driveStrafe(-24, 0.8, imu, log, kps, ki, kds);
-            driveTrain.rotateRelative(138 * mirrorField, imu, log);
-
- */
+            driveTrain.rotateRelative(-140 * mirrorField, imu, log);
+            driveTrain.driveStrafe(-38, 0.9, imu, log, kps, ki, kds);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

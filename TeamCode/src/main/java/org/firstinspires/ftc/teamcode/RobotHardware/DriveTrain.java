@@ -194,7 +194,7 @@ public class DriveTrain {
         PID pid = new PID(kP, kI, kD);
         final double distanceTolerance = 0.25; // inches
         final double minDrivePower = 0.15;     // minimum drive power to overcome static friction
-        final int settleCountsRequired = 5;
+        final int settleCountsRequired = 3;
 
         // Small PD for heading correction
         final double headingKp = 0.02;
@@ -449,7 +449,7 @@ public class DriveTrain {
         PID pid = new PID(0.01, 0, 0); // Tune these: Kp, Ki, Kd
         double minPower = 0.18;       // Minimum power to overcome friction — adjust based on your robot
         double toleranceDeg = 2.0;    // Consider "on target" if within this
-        int settleCountsRequired = 15; // Must stay within tolerance for ~15 loops (~300ms at 20ms loop)
+        int settleCountsRequired = 3; // Must stay within tolerance for ~15 loops (~300ms at 20ms loop)
         int settleCount = 0;
 
         while (true) {
@@ -527,7 +527,7 @@ public class DriveTrain {
         PID pid = new PID(kP, kI, kD);
         final double distanceTolerance = 0.25; // inches
         final double minDrivePower = 0.15;     // minimum drive power to overcome static friction
-        final int settleCountsRequired = 5;
+        final int settleCountsRequired = 3;
 
         // Small PD for heading correction
         final double headingKp = 0.02;
