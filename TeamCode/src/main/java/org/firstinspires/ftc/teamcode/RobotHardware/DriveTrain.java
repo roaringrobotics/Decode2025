@@ -134,40 +134,44 @@ public class DriveTrain {
             double fieldY, // + left, - right
             double rotate, double botHeading) {
 
-        // fieldX [-1.0, 1.0]
-        // fieldY [-1.0, 1.0]
-        // rotate [-1.0, 1.0].
-
-        // Rotate joystick input vectors for field centric control.
-
-        // Apply rotation matrix inverse of botHeading (-botHeading).
-        // |cos(-h) -sin(-h)| |fieldY|
-        // |sin(-h)  cos(-h)| |fieldX|
-        // h = botHeading
-        // fieldY = left stick x value
-        // fieldX = left stick y value.
-
-        // Invert Y axis if needed.  Using gobilda pinpoint convention.
-        // Y is horizontal field direction with positive to the left.
-        fieldY = -fieldY;
-        double robotY = fieldY * Math.cos(-botHeading) - fieldX * Math.sin(-botHeading);
-        double robotX = fieldY * Math.sin(-botHeading) + fieldX * Math.cos(-botHeading);
-
-        // Normalize output power [-1.0-1.0]
-        double vectorSum = Math.abs(robotX) + Math.abs(robotY) + Math.abs(rotate);
-        double denom = Math.max(vectorSum, 1.0);
-
-        // Set normalized field centric power levels.
-        fcPowerLevels.frontLeftPower = (robotY + robotX + rotate) / denom;
-        fcPowerLevels.backLeftPower = (-robotY + robotX + rotate) / denom;
-        fcPowerLevels.frontRightPower = (-robotY + robotX - rotate) / denom;
-        fcPowerLevels.backRightPower = (robotY + robotX - rotate) / denom;
+        // Delegate computation to testable static helper
+        FieldCentricPowerLevels result = computeFieldCentricPowerLevels(fieldX, fieldY, rotate, botHeading);
+        // copy into instance field
+        fcPowerLevels.frontLeftPower = result.frontLeftPower;
+        fcPowerLevels.backLeftPower = result.backLeftPower;
+        fcPowerLevels.frontRightPower = result.frontRightPower;
+        fcPowerLevels.backRightPower = result.backRightPower;
 
         dashboardTelemetry.addData("FC", String.format("Y: %.2f X: %.2f R: %.2f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, H: %.3f",
                 fieldY, fieldX, rotate,
                 fcPowerLevels.frontLeftPower, fcPowerLevels.frontRightPower,
                 fcPowerLevels.backLeftPower, fcPowerLevels.backRightPower,
                 Math.toDegrees(botHeading)));
+    }
+
+    // New testable static computation method – performs same math but without telemetry or instance state
+    public static FieldCentricPowerLevels computeFieldCentricPowerLevels(
+            double fieldX,
+            double fieldY,
+            double rotate,
+            double botHeading) {
+        FieldCentricPowerLevels out = new FieldCentricPowerLevels();
+        // Invert Y axis if needed.  Using gobilda pinpoint convention.
+        // Y is horizontal field direction with positive to the left.
+        double fy = -fieldY;
+        double robotY = fy * Math.cos(-botHeading) - fieldX * Math.sin(-botHeading);
+        double robotX = fy * Math.sin(-botHeading) + fieldX * Math.cos(-botHeading);
+
+        // Normalize output power [-1.0-1.0]
+        double vectorSum = Math.abs(robotX) + Math.abs(robotY) + Math.abs(rotate);
+        double denom = Math.max(vectorSum, 1.0);
+
+        out.frontLeftPower = (robotY + robotX + rotate) / denom;
+        out.backLeftPower = (-robotY + robotX + rotate) / denom;
+        out.frontRightPower = (-robotY + robotX - rotate) / denom;
+        out.backRightPower = (robotY + robotX - rotate) / denom;
+
+        return out;
     }
 
     // Class to hold field centric power level output from getFieldCentricPowerLevels
@@ -428,8 +432,8 @@ public class DriveTrain {
      * @param relativeAngleDeg The angle to rotate relative to current heading (e.g., +90 for 90° right)
      * @param imu              IMU interface for getting current heading
      * @param log              Logger for debugging (optional, can be null if not needed)
-     * @throws Exception
      */
+    @SuppressLint("DefaultLocale")
     public void rotateRelative(double relativeAngleDeg, ImuPositionI imu, LogI log) throws Exception {
         imu.update();
         double currentHeading = imu.getHeading(AngleUnit.DEGREES);
@@ -504,8 +508,9 @@ public class DriveTrain {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     public void driveStrafe(double distance, double power, ImuPositionI imu, LogI log,
-                              double kP, double kI, double kD) throws Exception {
+                            double kP, double kI, double kD) throws Exception {
         imu.update();
         Pose2D startPose = imu.getPose();
         double startHeadingDeg = imu.getHeading(AngleUnit.DEGREES);
@@ -619,4 +624,3 @@ public class DriveTrain {
         return powerScale;
     }
 }
-

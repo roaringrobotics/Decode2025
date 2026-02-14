@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Interfaces.TimeSourceI;
 import org.firstinspires.ftc.teamcode.Math.Vector2;
 import org.firstinspires.ftc.teamcode.Pathing.PIDController;
 import org.firstinspires.ftc.teamcode.Pathing.PowerRampController;
+import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
@@ -85,5 +86,31 @@ public class TestTeamCode {
         // the 20 ms.
         assertEquals(20, count);
         assertEquals(0.0, controller.lastValue, .001);
+    }
+
+    @Test
+    public void testFieldCentricPowerLevels() {
+        try (MockedStatic<Log> logMock = Mockito.mockStatic(Log.class)) {
+            // Case 1: forward (fieldX=1, fieldY=0, rotate=0, heading=0)
+            DriveTrain.FieldCentricPowerLevels p = DriveTrain.computeFieldCentricPowerLevels(1.0, 0.0, 0.0, 0.0);
+            assertEquals(1.0, p.frontLeftPower, 1e-6);
+            assertEquals(1.0, p.backLeftPower, 1e-6);
+            assertEquals(1.0, p.frontRightPower, 1e-6);
+            assertEquals(1.0, p.backRightPower, 1e-6);
+
+            // Case 2: strafe left (fieldX=0, fieldY=1, rotate=0, heading=0)
+            p = DriveTrain.computeFieldCentricPowerLevels(0.0, 1.0, 0.0, 0.0);
+            assertEquals(-1.0, p.frontLeftPower, 1e-6);
+            assertEquals(1.0, p.backLeftPower, 1e-6);
+            assertEquals(1.0, p.frontRightPower, 1e-6);
+            assertEquals(-1.0, p.backRightPower, 1e-6);
+
+            // Case 3: pure rotation (rotate=1)
+            p = DriveTrain.computeFieldCentricPowerLevels(0.0, 0.0, 1.0, 0.0);
+            assertEquals(1.0, p.frontLeftPower, 1e-6);
+            assertEquals(1.0, p.backLeftPower, 1e-6);
+            assertEquals(-1.0, p.frontRightPower, 1e-6);
+            assertEquals(-1.0, p.backRightPower, 1e-6);
+        }
     }
 }
