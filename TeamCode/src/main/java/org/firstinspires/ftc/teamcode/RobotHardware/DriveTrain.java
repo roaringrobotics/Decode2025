@@ -2,11 +2,15 @@ package org.firstinspires.ftc.teamcode.RobotHardware;
 
 import static java.lang.Thread.sleep;
 
+import android.annotation.SuppressLint;
+
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -23,6 +27,10 @@ public class DriveTrain {
     public DcMotor backRight;
     public FieldCentricPowerLevels fcPowerLevels = new FieldCentricPowerLevels();
     private final AndroidLog log = new AndroidLog();
+
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
     public DriveTrain(HardwareMap hardwareMap)
     {
 
@@ -92,43 +100,7 @@ public class DriveTrain {
         setBackRightPower(0);
     }
 
-    /**
-     * Adjusts motor powers to follow a target heading. Call repeatedly from a loop.
-     * @param imu IMU implementation providing heading (degrees)
-     * @param targetAngleDeg target heading in degrees
-     * @param maxPower maximum absolute motor power (0..1)
-     * @param kP proportional gain applied to heading error
-     * @param toleranceDeg if absolute error is within this, motors are stopped
-     */
-    public void followHeading(ImuPositionI imu,
-                              double targetAngleDeg,
-                              double maxPower,
-                              double kP,
-                              double toleranceDeg) {
-        imu.update();
-        double heading = imu.getHeading(AngleUnit.DEGREES);
-
-        double error = targetAngleDeg - heading;
-        // normalize error to [-180, 180]
-        while (error > 180) error -= 360;
-        while (error <= -180) error += 360;
-
-        if (Math.abs(error) <= toleranceDeg) {
-            stopMotors();
-            return;
-        }
-
-        double turn = kP * error;
-        if (turn > maxPower) turn = maxPower;
-        if (turn < -maxPower) turn = -maxPower;
-
-        // Apply turn power: left motors positive, right motors negative (matches driveFieldCentric convention)
-        frontLeft.setPower(turn);
-        backLeft.setPower(turn);
-        frontRight.setPower(-turn);
-        backRight.setPower(-turn);
-    }
-    private static class FieldCentricPowerLevels {
+     public static class FieldCentricPowerLevels {
         public double frontLeftPower;
         public double backLeftPower;
         public double frontRightPower;
@@ -138,63 +110,68 @@ public class DriveTrain {
 
         }
     }
-    public void driveFieldCentric(double leftStickY, double leftStickX, double rightStickX,
+    public void driveFieldCentric(double fieldX, double fieldY, double rightStickX,
                                    double powerScale, Hardware hw) {
         // Takes joystick input and sets motor power levels to drive
         // robot field centric.
+        // fieldX is the field centric away/towards driver stick input (forward/back)
+        // fieldY is the field centric horizontal movement.
         hw.imuPos.update();
         double botHeading = hw.imuPos.getHeading(AngleUnit.RADIANS);
 
         getFieldCentricPowerLevels(
-                leftStickY, leftStickX,
+                fieldX, fieldY,
                 rightStickX, botHeading);
-//        log.d("PathController", "===========================================");
-//        log.d("PathController", String.format("fl: %f", fcPowerLevels.frontLeftPower));
-//        log.d("PathController", String.format("fr: %f", fcPowerLevels.frontRightPower));
-//        log.d("PathController", String.format("bl: %f", fcPowerLevels.backLeftPower));
-//        log.d("PathController", String.format("br: %f", fcPowerLevels.backRightPower));
-//        log.d("PathController", "===========================================");
 
         frontLeft.setPower(fcPowerLevels.frontLeftPower * powerScale);
         backLeft.setPower(fcPowerLevels.backLeftPower * powerScale);
         frontRight.setPower(fcPowerLevels.frontRightPower * powerScale);
         backRight.setPower(fcPowerLevels.backRightPower * powerScale);
     }
+    @SuppressLint("DefaultLocale")
     private void getFieldCentricPowerLevels(
-            double drive, double strafe,
+            double fieldX, // + away from driver, - towards driver
+            double fieldY, // + left, - right
             double rotate, double botHeading) {
 
-        // drive forward/backward [-1.0, 1.0]
-        // strafe strafe [-1.0, 1.0]
-        // rotate rotate [-1.0, 1.0].
+        // fieldX [-1.0, 1.0]
+        // fieldY [-1.0, 1.0]
+        // rotate [-1.0, 1.0].
 
         // Rotate joystick input vectors for field centric control.
 
         // Apply rotation matrix inverse of botHeading (-botHeading).
-        // | cos(-h) -sin(-h) | | drive |
-        // | sin(-h)  cos(-h) | | strafe|
+        // |cos(-h) -sin(-h)| |fieldY|
+        // |sin(-h)  cos(-h)| |fieldX|
         // h = botHeading
-        // strafe = left stick x value
-        // drive = left stick y value.
-        double rotatedStrafe = -strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
-        double rotatedDrive = -strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
+        // fieldY = left stick x value
+        // fieldX = left stick y value.
 
-        // Don't know why the rotated value of left stick x is scale by 1.1.
-        // It's not in online example code.
-        //rotatedX = rotatedX * 1.1;
+        // Invert Y axis if needed.  Using gobilda pinpoint convention.
+        // Y is horizontal field direction with positive to the left.
+        fieldY = -fieldY;
+        double robotY = fieldY * Math.cos(-botHeading) - fieldX * Math.sin(-botHeading);
+        double robotX = fieldY * Math.sin(-botHeading) + fieldX * Math.cos(-botHeading);
 
         // Normalize output power [-1.0-1.0]
-        double vectorSum = Math.abs(rotatedDrive) + Math.abs(rotatedStrafe) + Math.abs(rotate);
+        double vectorSum = Math.abs(robotX) + Math.abs(robotY) + Math.abs(rotate);
         double denom = Math.max(vectorSum, 1.0);
 
         // Set normalized field centric power levels.
-        fcPowerLevels.frontLeftPower = (-rotatedStrafe + rotatedDrive + rotate) / denom;
-        fcPowerLevels.backLeftPower = (rotatedStrafe + rotatedDrive + rotate) / denom;
-        fcPowerLevels.frontRightPower = (rotatedStrafe + rotatedDrive - rotate) / denom;
-        fcPowerLevels.backRightPower = (-rotatedStrafe + rotatedDrive - rotate) / denom;
+        fcPowerLevels.frontLeftPower = (robotY + robotX + rotate) / denom;
+        fcPowerLevels.backLeftPower = (-robotY + robotX + rotate) / denom;
+        fcPowerLevels.frontRightPower = (-robotY + robotX - rotate) / denom;
+        fcPowerLevels.backRightPower = (robotY + robotX - rotate) / denom;
+
+        dashboardTelemetry.addData("FC", String.format("Y: %.2f X: %.2f R: %.2f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, H: %.3f",
+                fieldY, fieldX, rotate,
+                fcPowerLevels.frontLeftPower, fcPowerLevels.frontRightPower,
+                fcPowerLevels.backLeftPower, fcPowerLevels.backRightPower,
+                Math.toDegrees(botHeading)));
     }
 
     // Class to hold field centric power level output from getFieldCentricPowerLevels
+    @SuppressLint("DefaultLocale")
     public void driveStraight(double distance, double power, ImuPositionI imu, LogI log,
                               double kP, double kI, double kD) throws Exception {
         imu.update();
@@ -298,13 +275,14 @@ public class DriveTrain {
             log.d("DriveStraight", "Complete. Traveled: " + distanceTraveled);
         }
     }
-    public void driveLinear(double x,
-                            double y,
-                            double endDegrees,
-                            double power,
-                            boolean isRed,
-                            ImuPositionI imu,
-                            LogI log, double kp, double ki, double kd) throws Exception {
+    @SuppressLint("DefaultLocale")
+    public void driveToRelative(double x,
+                                double y,
+                                double endDegrees,
+                                double power,
+                                boolean isRed,
+                                ImuPositionI imu,
+                                LogI log, double kp, double ki, double kd) throws Exception {
         imu.reset();
         imu.update();
         Pose2D startPose = imu.getPose();
@@ -398,16 +376,13 @@ public class DriveTrain {
                 }
             }
 
-            // Convert field-centric to robot-centric
-            // Rotate drive vector by -botHeading to get robot-relative motion
-            // driveY is strafe, driveX is forward, so we swap them in the rotation matrix
-            // This is defined by the pinpoint odometry computer
             double botHeadingRad = Math.toRadians(curHeading);
-            double robotX = driveX * Math.cos(-botHeadingRad) - driveY * Math.sin(-botHeadingRad);
-            double robotY = driveX * Math.sin(-botHeadingRad) + driveY * Math.cos(-botHeadingRad);
+            double robotX = driveY * Math.cos(-botHeadingRad) - driveX * Math.sin(-botHeadingRad);
+            double robotY = driveY * Math.sin(-botHeadingRad) + driveX * Math.cos(-botHeadingRad);
 
-            // Apply the mysterious 1.1 scaling factor for strafe (from your original code)
-            // robotX = robotX * 1.1;
+            // Invert Y axis.  Using gobilda pinpoint convention.
+            // Y is horizontal field direction with positive to the left.
+            robotY = -1.0 * robotY;
 
             // Calculate mecanum wheel powers
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
@@ -425,18 +400,14 @@ public class DriveTrain {
             setFrontRightPower(frPower * power);
             setBackRightPower(brPower * power);
 
-            /*
-            fcPowerLevels.frontLeftPower = -(rotatedY + rotatedX - rotate) / denom;
-            fcPowerLevels.backLeftPower = (rotatedY - rotatedX - rotate) / denom;
-            fcPowerLevels.frontRightPower = (rotatedY - rotatedX + rotate) / denom;
-            fcPowerLevels.backRightPower = -(rotatedY + rotatedX + rotate) / denom;
-             */
-            if (log != null) {
-                log.d("DriveLinear", String.format("Dist: %.2f Angle: %.1f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, H: %.3f",
-                        remainingDistance, headingError, flPower, frPower, blPower, brPower, curHeading));
-            }
+            dashboardTelemetry.addData("DriveLinear",
+                    String.format("rem: %.3f | hErr: %.2f | pos: (%.2f, %.2f) | tgt: (%.2f, %.2f) | power: (FL: %.3f, FR: %.3f, BL: %.3f, BR: %.3f)",
+                    remainingDistance, headingError,
+                    curPose.getX(DistanceUnit.INCH), curPose.getY(DistanceUnit.INCH),
+                    targetPose.getX(DistanceUnit.INCH), targetPose.getY(DistanceUnit.INCH),
+                    flPower * power, frPower * power, blPower * power, brPower * power));
 
-            sleep(20);
+            sleep(1);
         }
 
         stopMotors();
@@ -445,60 +416,6 @@ public class DriveTrain {
         }
     }
 
-
-    public void rotate(double targetAngleDeg, ImuPositionI imu, LogI log) throws Exception {
-        imu.update();
-        double heading = imu.getHeading(AngleUnit.DEGREES);
-
-        double error = targetAngleDeg - heading;
-        // normalize error to [-180, 180]
-        while (error > 180) error -= 360;
-        while (error <= -180) error += 360;
-
-        PID pidRotate = new PID(0.012, 0.0001, 0.001); // Example tuned values: adjust Kp/Ki/Kd based on testing
-        double minPower = 0.18; // Minimum power to overcome friction (tune this!)
-        int onTargetCount = 0;
-        int requiredCounts = 10; // Must be on-target for ~10 loops
-
-        while (Math.abs(error) > 2 || onTargetCount < requiredCounts) { // Coarse + settle
-            double power = pidRotate.calculate(0, error); // Many PID impls use calculate(setpoint=0, processVar=error)
-            // Or if yours is calculate(target, current): pidRotate.calculate(targetAngleDeg, heading)
-
-            // Apply min power (preserve sign)
-            if (Math.abs(power) < minPower && Math.abs(error) > 2) {
-                power = minPower * Math.signum(power);
-            }
-
-            // Clamp
-            power = Math.max(-1.0, Math.min(1.0, power));
-
-            // Tank rotate in place (assuming standard FTC config: +power = clockwise turn)
-            setFrontLeftPower(-power);
-            setBackLeftPower(-power);
-            setFrontRightPower(power);
-            setBackRightPower(power);
-
-            log.d("heading", String.valueOf(heading));
-            log.d("error", String.valueOf(error));
-            log.d("power", String.valueOf(power));
-            log.d("", "----------------------------");
-
-            imu.update();
-            heading = imu.getHeading(AngleUnit.DEGREES);
-
-            error = targetAngleDeg - heading;
-            // normalize error to [-180, 180]
-            while (error > 180) error -= 360;
-            while (error <= -180) error += 360;
-
-            if (Math.abs(error) < 2) onTargetCount++;
-            else onTargetCount = 0;
-
-            sleep(20); // Slower loop for stability
-        }
-
-        stopMotors();
-    }
     public static double clamp(double value, double min, double max) {
         if (min > max) throw new IllegalArgumentException("min must be <= max");
         return Math.max(min, Math.min(max, value));
@@ -701,6 +618,5 @@ public class DriveTrain {
         }
         return powerScale;
     }
-
 }
 

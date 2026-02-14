@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
@@ -21,6 +23,9 @@ public class TeleOpDecode extends LinearOpMode {
     private SystemTimeSource timesource = new SystemTimeSource();
     private final AndroidLog log = new AndroidLog();
 
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
     // 3. Add a timer to debounce the button
 
 
@@ -33,13 +38,21 @@ public class TeleOpDecode extends LinearOpMode {
         waitForStart();
         float deadZone = 0.5F;
         while (opModeIsActive()) {
+<<<<<<< HEAD
             double drive = gamepad1.left_stick_y;
             double strafe = -gamepad1.left_stick_x; // the negative is a hotfix
+=======
+            double fieldX = -gamepad1.left_stick_y;
+            double fieldY = -gamepad1.left_stick_x;
+>>>>>>> 163f86f (More Try to make drive/strafe calculations sign consistant.)
             double rotate = gamepad1.right_stick_x;
+
+            dashboardTelemetry.addData("fieldX", fieldX);
+            dashboardTelemetry.addData("fieldY", fieldY);
+            dashboardTelemetry.addData("rotate", rotate);
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
 
-
-            driveTrain.driveFieldCentric(drive, strafe, rotate, powerScale, hw);
+            driveTrain.driveFieldCentric(fieldX, fieldY, rotate, powerScale, hw);
 
             timesource.update();
 
