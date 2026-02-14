@@ -38,13 +38,8 @@ public class TeleOpDecode extends LinearOpMode {
         waitForStart();
         float deadZone = 0.5F;
         while (opModeIsActive()) {
-<<<<<<< HEAD
-            double drive = gamepad1.left_stick_y;
+            double drive = -gamepad1.left_stick_y;
             double strafe = -gamepad1.left_stick_x; // the negative is a hotfix
-=======
-            double fieldX = -gamepad1.left_stick_y;
-            double fieldY = -gamepad1.left_stick_x;
->>>>>>> 163f86f (More Try to make drive/strafe calculations sign consistant.)
             double rotate = gamepad1.right_stick_x;
 
             dashboardTelemetry.addData("fieldX", fieldX);

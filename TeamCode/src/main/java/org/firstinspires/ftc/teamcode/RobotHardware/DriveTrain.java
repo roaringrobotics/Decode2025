@@ -142,11 +142,13 @@ public class DriveTrain {
         fcPowerLevels.frontRightPower = result.frontRightPower;
         fcPowerLevels.backRightPower = result.backRightPower;
 
-        dashboardTelemetry.addData("FC", String.format("Y: %.2f X: %.2f R: %.2f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, H: %.3f",
+        dashboardTelemetry.addData("FC",
+                String.format("Y: %.2f X: %.2f R: %.2f | FL:%.2f FR:%.2f BL:%.2f BR:%.2f, H: %.3f",
                 fieldY, fieldX, rotate,
                 fcPowerLevels.frontLeftPower, fcPowerLevels.frontRightPower,
                 fcPowerLevels.backLeftPower, fcPowerLevels.backRightPower,
                 Math.toDegrees(botHeading)));
+        dashboardTelemetry.update();
     }
 
     // New testable static computation method – performs same math but without telemetry or instance state

@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
@@ -22,6 +24,8 @@ public class DecodeSingleTeleop extends LinearOpMode {
     private SystemTimeSource timesource = new SystemTimeSource();
     private final AndroidLog log = new AndroidLog();
 
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
     // 3. Add a timer to debounce the button
 
 
@@ -35,15 +39,19 @@ public class DecodeSingleTeleop extends LinearOpMode {
         float deadZone = 0.5F;
         while (opModeIsActive()) {
 
-            double drive = gamepad1.left_stick_y;
+            double drive = -gamepad1.left_stick_y;
             double strafe = -gamepad1.left_stick_x; // the negative is a hotfix
             double rotate = gamepad1.right_stick_x;
+            dashboardTelemetry.addData("fieldX", fieldX);
+            dashboardTelemetry.addData("fieldY", fieldY);
+            dashboardTelemetry.addData("rotate", rotate);
+            dashboardTelemetry.update();
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
             hw.imuPos.update();
 //            log.d("Heading: ", String.valueOf(hw.imuPos.getHeading(AngleUnit.DEGREES)));
 
 
-            driveTrain.driveFieldCentric(drive, strafe, rotate, powerScale, hw);
+            driveTrain.driveFieldCentric(fieldX, fieldY, rotate, powerScale, hw);
 
             timesource.update();
 
