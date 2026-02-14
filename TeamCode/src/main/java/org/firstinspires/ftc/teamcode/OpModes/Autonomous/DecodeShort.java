@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 */
 
 
-@Autonomous(name = "Shoot From Triangle", group = "Autonomous")
+@Autonomous(name = "Shoot From Triangle")
 public class DecodeShort extends LinearOpMode {
 
     private DriveTrain driveTrain;
@@ -76,9 +76,12 @@ public class DecodeShort extends LinearOpMode {
         double x = 0;
         double h = 0;
         double targetDistance = 0;
+
         double mirrorField = 1;
         String team = "Blue Side";
         int rows = 0;
+        boolean collectFromBasket = false;
+        boolean stayInTriangle = false;
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         imu.reset();
@@ -98,11 +101,22 @@ public class DecodeShort extends LinearOpMode {
             }
             telemetry.addData("Side", team);
             if (gamepad2.dpadUpWasPressed()) {
-                rows = (rows + 1) % 4;
+                rows++;
             } else if (gamepad2.dpadDownWasPressed()) {
-                rows = (rows - 1) % 4;
+                rows--;
             }
+            rows = Math.abs(rows) % 4;
             telemetry.addData("Rows", rows);
+
+            if (gamepad2.shareWasPressed()) {
+                collectFromBasket = !collectFromBasket;
+            }
+            telemetry.addData("Collect From Basket", collectFromBasket);
+
+            if (gamepad2.aWasPressed()) {
+                stayInTriangle = !stayInTriangle;
+            }
+            telemetry.addData("Stay in Triangle", stayInTriangle);
             idle();
         }
 
@@ -123,36 +137,56 @@ public class DecodeShort extends LinearOpMode {
             driveTrain.driveStraight(-6, .5, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(23 * mirrorField, imu, log);
             stateTimer.reset();
-            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+            while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
                 shooter.continousShoot(false, false, true);
             }
-            for (int i = 0; i < rows; i++) {
-                shooter.resetShooter();
+            shooter.resetShooter();
+            for (int i = 1; i <= rows; i++) {
                 driveTrain.rotateRelative(-113 * mirrorField, imu, log);
-                driveTrain.driveStrafe(-20 - i * 20, .8, imu, log, kps, ki, kds);
+                driveTrain.driveStrafe(-20 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 shooter.startIntake();
-                driveTrain.driveStraight(40, .5, imu, log, kp, ki, kd);
-                shooter.stopIntake();
-                driveTrain.driveStraight(-40, .8, imu, log, kp, ki, kd);
-                driveTrain.rotateRelative(90 * mirrorField, imu, log);
-                driveTrain.driveStraight(15 + i * 20, .8, imu, log, kps, ki, kds);
-                driveTrain.rotateRelative(23 * mirrorField, imu, log);
-                stateTimer.reset();
+                driveTrain.driveStraight(34, 0.9, imu, log, kp, ki, kd);
+                sleep(300);
                 shooter.resetShooter();
-                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
-                    shooter.continousShoot(false, false, true);
+                driveTrain.driveStraight(-34, 0.9, imu, log, kp, ki, kd);
+                if (i <= 1 || stayInTriangle) {
+                    driveTrain.driveStrafe(20 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                    driveTrain.rotateRelative(113 * mirrorField, imu, log);
+                } else {
+                    driveTrain.driveStrafe(-20 * mirrorField, 0.9, imu, log, kps, ki, kds);
+                    driveTrain.rotateRelative(140 * mirrorField, imu, log);
                 }
-                if (i == 1){
-                    while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
+
+                stateTimer.reset();
+                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
+                    if (i > 1) {
                         shooter.continousShoot(false, true, false);
-                }
-                }
-                if(i >= 2) {
-                    while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 5000) {
-                        shooter.continousShoot(false, true, false);
+                    } else {
+                        shooter.continousShoot(false, false, true);
                     }
                 }
+                shooter.resetShooter();
+
             }
+            if (collectFromBasket || rows <= 1) {
+                if (rows <= 1 || stayInTriangle) {
+                    driveTrain.rotateRelative(-113 * mirrorField, imu, log);
+                    driveTrain.driveStraight(43, 0.9, imu, log, kp, ki, kd);
+                } else {
+                    driveTrain.rotateRelative(-140 * mirrorField, imu, log);
+                    driveTrain.driveStrafe(35, 0.9, imu, log, kps, ki, kds);
+                    driveTrain.driveStraight(43, 0.9, imu, log, kp, ki, kd);
+                }
+                driveTrain.rotateRelative(-90 * mirrorField, imu, log);
+                shooter.startIntake();
+
+                // sleep until auto is over
+                sleep(30000);
+            } else {
+                driveTrain.rotateRelative(-140 * mirrorField, imu, log);
+                driveTrain.driveStrafe(-38, 0.9, imu, log, kps, ki, kds);
+            }
+
     }   catch (Exception e) {
             throw new RuntimeException(e);
         }

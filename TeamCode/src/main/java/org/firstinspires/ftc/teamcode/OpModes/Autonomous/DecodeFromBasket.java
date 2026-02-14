@@ -99,7 +99,7 @@ public class DecodeFromBasket extends LinearOpMode {
             } else if (gamepad2.dpadDownWasPressed()) {
                 rows--;
             }
-            rows = Math.abs(rows % 4);
+            rows = Math.abs(rows) % 4;
             telemetry.addData("Rows", rows);
         }
 
@@ -116,7 +116,7 @@ public class DecodeFromBasket extends LinearOpMode {
         double kds = 0.29;
         try {
             shooter.startShooterMotor(1000);
-            driveTrain.driveStraight(55, 0.8, imu, log, kp, ki, kd);
+            driveTrain.driveStraight(55, 0.9, imu, log, kp, ki, kd);
 //            driveTrain.rotateRelative(-138 * mirrorField, imu, log);
 
             stateTimer.reset();
@@ -138,7 +138,7 @@ public class DecodeFromBasket extends LinearOpMode {
                 driveTrain.rotateRelative(-140 * mirrorField, imu, log);
                 driveTrain.driveStrafe(25 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 shooter.startIntake();
-                driveTrain.driveStraight(38 + i * 3, 0.4, imu, log, kp, ki, kd);
+                driveTrain.driveStraight(38 + i * 3, 0.9, imu, log, kp, ki, kd);
 
                 // keep the intake running for a bit to ensure we get the balls in
                 sleep(300);
