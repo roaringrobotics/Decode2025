@@ -68,9 +68,9 @@ public class Vector2 {
     public void normalize()
     {
         // normalize to unit vector.
-        // A normalized vector has a norm/length of 1.
+        // A normalized vector has a length of 1.
         double mag = norm();
-        if(mag == 0)
+        if(Math.abs(mag) < 1e-6)
             return;
         x /= mag;
         y /= mag;

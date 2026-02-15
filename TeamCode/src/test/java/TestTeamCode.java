@@ -113,4 +113,31 @@ public class TestTeamCode {
             assertEquals(-1.0, p.backRightPower, 1e-6);
         }
     }
+
+    @Test
+    public void testVector2DistanceBetweenPoses() {
+        Pose2D a = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+        Pose2D b = new Pose2D(DistanceUnit.INCH, 3, 4, AngleUnit.DEGREES, 0);
+        double distance = Vector2.distanceBetweenPoses(a, b);
+        assertEquals(5.0, distance, 1e-6);
+    }
+
+    @Test
+    public void testVector2Normalize() {
+        Vector2 v = new Vector2(3, 4);
+        v.normalize();
+        assertEquals(0.6, v.x, 1e-6);
+        assertEquals(0.8, v.y, 1e-6);
+
+        Vector2 v2 = new Vector2(0, 4);
+        v2.normalize();
+        assertEquals(0.0, v2.x, 1e-6);
+        assertEquals(1.0, v2.y, 1e-6);
+
+        Vector2 v3 = new Vector2(5, 0);
+        v3.normalize();
+        assertEquals(1.0, v3.x, 1e-6);
+        assertEquals(0.0, v3.y, 1e-6);
+
+    }
 }

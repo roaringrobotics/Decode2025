@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Interfaces.LogI;
 import org.firstinspires.ftc.teamcode.Interfaces.ImuPositionI;
 import org.firstinspires.ftc.teamcode.Math.Vector2;
 import org.firstinspires.ftc.teamcode.Pathing.PID;
+import org.firstinspires.ftc.teamcode.Pathing.PID2D;
 
 public class DriveTrain {
     public DcMotor frontRight;
@@ -285,36 +286,32 @@ public class DriveTrain {
     public void driveToRelative(double x,
                                 double y,
                                 double endDegrees,
-                                double power,
-                                boolean isRed,
-                                ImuPositionI imu,
-                                LogI log, double kp, double ki, double kd) throws Exception {
+                                double maxPower,
+                                ImuPositionI imu) throws Exception {
+        // Reset pose to (0,0,0) since movement will be relative to current position and heading.
+        // This simplifies math since we can treat current position as origin and just drive to
+        // (x,y) with target heading of endDegrees.
         imu.reset();
         imu.update();
         Pose2D startPose = imu.getPose();
-        if (isRed) {
-            y = -y;
-            endDegrees = -endDegrees;
-        }
-        // Calculate target pose in field coordinates
-        Pose2D targetPose = new Pose2D(
-                DistanceUnit.INCH,
-                startPose.getX(DistanceUnit.INCH) + x,
-                startPose.getY(DistanceUnit.INCH) + y,
-                AngleUnit.DEGREES,
-                endDegrees);
-
-        double targetDistance = Math.sqrt(x * x + y * y);
 
         // PID controllers
-        PID drivePID = new PID(0.23, ki, 0);     // For position control
-        PID rotatePID = new PID(kp, ki, kd); // For rotation control
-
+        PID2D drivePID = new PID2D(0.25, 0, 0);     // For position control
+        PID rotatePID = new PID(.1, 0, 0); // For rotation control
+        final double minPower = 0.2;          // Minimum power to overcome static friction
         final double distanceTolerance = 0.5;  // inches
         final double angleTolerance = 2.0;     // degrees
-        final double minDrivePower = 0.12;
-        final double minRotatePower = 0.15;
         final int settleCountsRequired = 5;
+        final double targetDistance = Math.sqrt(x * x + y * y);
+
+        // Direction vector from start to target (normalized)
+        // Since we're driving to a relative position, this is just the vector from (0,0) to (x,y)
+        // in the initial relative frame of reference.
+        // We will rotate this vector by the negative of the current heading to
+        // get robot-centric coordinates to always move in the correct direction regardless
+        // of initial rotation.
+        final Vector2 directionVector = new Vector2(x, y);
+        directionVector.normalize();
 
         int settleCount = 0;
         long lastTime = System.nanoTime();
@@ -327,11 +324,13 @@ public class DriveTrain {
 
             Pose2D curPose = imu.getPose();
             double curHeading = curPose.getHeading(AngleUnit.DEGREES);
+            double curX = curPose.getX(DistanceUnit.INCH);
+            double curY = curPose.getY(DistanceUnit.INCH);
 
             // Calculate remaining distance to target
-            double deltaX = targetPose.getX(DistanceUnit.INCH) - curPose.getX(DistanceUnit.INCH);
-            double deltaY = targetPose.getY(DistanceUnit.INCH) - curPose.getY(DistanceUnit.INCH);
-            double remainingDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            double deltaX = x - curX;
+            double deltaY = y - curY;
+            double currentDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
             // Calculate heading error
             double headingError = endDegrees - curHeading;
@@ -339,7 +338,7 @@ public class DriveTrain {
             while (headingError <= -180) headingError += 360;
 
             // Check if we're on target
-            boolean positionOnTarget = remainingDistance <= distanceTolerance;
+            boolean positionOnTarget = Math.abs(targetDistance - currentDistance) <= distanceTolerance;
             boolean headingOnTarget = Math.abs(headingError) <= angleTolerance;
 
             if (positionOnTarget && headingOnTarget) {
@@ -349,25 +348,34 @@ public class DriveTrain {
                 settleCount = 0;
             }
 
-            // Calculate drive vector in field frame
-            double driveX = 0.0;
-            double driveY = 0.0;
-
+            double robotX = 0;
+            double robotY = 0;
             if (!positionOnTarget) {
                 // PID control based on remaining distance
-                double driveMagnitude = drivePID.calculate(targetDistance, targetDistance - remainingDistance);
+                double[] drivePower2d = drivePID.calculate(
+                        x, y,
+                        curX, curY);
+                // Convert 2D PID output to a single power level (magnitude of the vector)
+                double drivePower =
+                        Math.sqrt(drivePower2d[0] * drivePower2d[0] + drivePower2d[1] * drivePower2d[1]);
 
                 // Apply minimum power
-                if (Math.abs(driveMagnitude) < minDrivePower) {
-                    driveMagnitude = minDrivePower * Math.signum(driveMagnitude);
+                if (Math.abs(drivePower) < minPower) {
+                    drivePower = minPower * Math.signum(drivePower);
                 }
 
-                // Direction vector (normalized)
-                double dirX = deltaX / remainingDistance;
-                double dirY = deltaY / remainingDistance;
+                drivePower = clamp(drivePower, -maxPower, maxPower);
 
-                driveX = dirX * driveMagnitude;
-                driveY = dirY * driveMagnitude;
+                // Rotate the direction vector by the negative of the current
+                // heading to get robot-centric coordinates
+                double botHeadingRad = Math.toRadians(curHeading);
+                robotX = directionVector.y * Math.cos(-botHeadingRad) -
+                        directionVector.x * Math.sin(-botHeadingRad);
+                robotY = directionVector.y * Math.sin(-botHeadingRad) +
+                        directionVector.x * Math.cos(-botHeadingRad);
+
+                robotX *= drivePower;
+                robotY *= drivePower;
             }
 
             // Calculate rotation power
@@ -377,49 +385,38 @@ public class DriveTrain {
                 rotatePower = -rotatePower;
 
                 // Apply minimum rotation power
-                if (Math.abs(rotatePower) < minRotatePower && Math.abs(headingError) > angleTolerance) {
-                    rotatePower = minRotatePower * Math.signum(rotatePower);
+                if (Math.abs(rotatePower) < minPower) {
+                    rotatePower = minPower * Math.signum(rotatePower);
                 }
             }
 
-            double botHeadingRad = Math.toRadians(curHeading);
-            double robotX = driveY * Math.cos(-botHeadingRad) - driveX * Math.sin(-botHeadingRad);
-            double robotY = driveY * Math.sin(-botHeadingRad) + driveX * Math.cos(-botHeadingRad);
-
-            // Invert Y axis.  Using gobilda pinpoint convention.
-            // Y is horizontal field direction with positive to the left.
-            robotY = -1.0 * robotY;
-
             // Calculate mecanum wheel powers
+            // minMaxScaler is used to normalize powers when the sum exceeds 1.0
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
-            double denom = Math.max(vectorSum, 1.0);
+            double minMaxScaler = Math.max(vectorSum, 1.0);
 
-            double flPower = (robotY + robotX + rotatePower) / denom;
-            double blPower = (-robotY + robotX + rotatePower) / denom;
-            double frPower = (-robotY + robotX - rotatePower) / denom;
-            double brPower = (robotY + robotX - rotatePower) / denom;
+            double flPower = (robotY + robotX + rotatePower) / minMaxScaler;
+            double blPower = (-robotY + robotX + rotatePower) / minMaxScaler;
+            double frPower = (-robotY + robotX - rotatePower) / minMaxScaler;
+            double brPower = (robotY + robotX - rotatePower) / minMaxScaler;
 
-            // Apply power limit and signs (matching your motor configuration)
+            setFrontLeftPower(flPower);
+            setBackLeftPower(blPower);
+            setFrontRightPower(frPower);
+            setBackRightPower(brPower);
 
-            setFrontLeftPower(flPower * power);
-            setBackLeftPower(blPower * power);
-            setFrontRightPower(frPower * power);
-            setBackRightPower(brPower * power);
-
-            dashboardTelemetry.addData("DriveLinear",
-                    String.format("rem: %.3f | hErr: %.2f | pos: (%.2f, %.2f) | tgt: (%.2f, %.2f) | power: (FL: %.3f, FR: %.3f, BL: %.3f, BR: %.3f)",
-                    remainingDistance, headingError,
-                    curPose.getX(DistanceUnit.INCH), curPose.getY(DistanceUnit.INCH),
-                    targetPose.getX(DistanceUnit.INCH), targetPose.getY(DistanceUnit.INCH),
-                    flPower * power, frPower * power, blPower * power, brPower * power));
-
-            sleep(1);
+            dashboardTelemetry.addData(
+                    "DriveToRel",
+                    String.format("Target (%.1f, %.1f, %.1f) | Cur (%.1f, %.1f, %.1f) | Dist Rem: %.2f | HErr: %.2f | Pwr (FL: %.2f, BL: %.2f, FR: %.2f, BR: %.2f)",
+                    x, y, endDegrees,
+                    curX, curY, curHeading,
+                    currentDistance,
+                    headingError,
+                    flPower, blPower, frPower, brPower));
         }
 
         stopMotors();
-        if (log != null) {
-            log.d("DriveLinear", "Complete - reached target position and heading");
-        }
+        log.d("DriveLinear", "Complete - reached target position and heading");
     }
 
     public static double clamp(double value, double min, double max) {

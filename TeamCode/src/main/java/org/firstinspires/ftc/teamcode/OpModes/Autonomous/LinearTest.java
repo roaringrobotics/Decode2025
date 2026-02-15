@@ -132,7 +132,7 @@ public class LinearTest extends LinearOpMode {
         // Start autonomous
         stateTimer.reset();
         try {
-            driveTrain.driveToRelative(0, 0, 45, 0.5, isRed, imu, log, kp, ki, kd);
+            driveTrain.driveToRelative(0, 0, 45, 0.5, imu);
 //            driveTrain.rotateRelative(45 * (isRed ? -1 : 1), imu, log);
             driveTrain.stopMotors();
         } catch (Exception e) {
