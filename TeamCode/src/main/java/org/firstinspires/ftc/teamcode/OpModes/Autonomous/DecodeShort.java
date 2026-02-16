@@ -171,11 +171,11 @@ public class DecodeShort extends LinearOpMode {
             if (collectFromBasket || rows <= 1) {
                 if (rows <= 1 || stayInTriangle) {
                     driveTrain.rotateRelative(-113 * mirrorField, imu, log);
-                    driveTrain.driveStraight(43, 0.9, imu, log, kp, ki, kd);
+                    driveTrain.driveStraight(44, 0.9, imu, log, kp, ki, kd);
                 } else {
                     driveTrain.rotateRelative(-140 * mirrorField, imu, log);
                     driveTrain.driveStrafe(35, 0.9, imu, log, kps, ki, kds);
-                    driveTrain.driveStraight(43, 0.9, imu, log, kp, ki, kd);
+                    driveTrain.driveStraight(44, 0.9, imu, log, kp, ki, kd);
                 }
                 driveTrain.rotateRelative(-90 * mirrorField, imu, log);
                 shooter.startIntake();

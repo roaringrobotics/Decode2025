@@ -136,7 +136,7 @@ public class DecodeFromBasket extends LinearOpMode {
                     driveTrain.driveStrafe(-11 * mirrorField, 0.9, imu, log, kps, ki, kds);
                 }
                 driveTrain.rotateRelative(-140 * mirrorField, imu, log);
-                driveTrain.driveStrafe(25 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.driveStrafe(27 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 shooter.startIntake();
                 driveTrain.driveStraight(38 + i * 3, 0.9, imu, log, kp, ki, kd);
 
@@ -144,7 +144,7 @@ public class DecodeFromBasket extends LinearOpMode {
                 sleep(300);
                 shooter.resetShooter();
                 driveTrain.driveStraight(-38 + i * 3, 0.9, imu, log, kp, ki, kd);
-                driveTrain.driveStrafe(-25 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.driveStrafe(-27 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 driveTrain.rotateRelative(140 * mirrorField, imu, log);
 
                 stateTimer.reset();
@@ -153,8 +153,9 @@ public class DecodeFromBasket extends LinearOpMode {
                 }
                 shooter.resetShooter();
             }
-            driveTrain.rotateRelative(-140 * mirrorField, imu, log);
-            driveTrain.driveStrafe(-38, 0.9, imu, log, kps, ki, kds);
+            driveTrain.rotateRelative(-50 * mirrorField, imu, log);
+            driveTrain.driveStraight(-38, 0.9, imu, log, kps, ki, kds);
+            driveTrain.rotateRelative(-90, imu, log);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
