@@ -46,15 +46,27 @@ public class TeleOpDecode extends LinearOpMode {
             dashboardTelemetry.addData("fieldY", fieldY);
             dashboardTelemetry.addData("rotate", rotate);
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
+            int targetVelocity;
 
             driveTrain.driveFieldCentric(fieldX, fieldY, rotate, powerScale, hw);
 
             timesource.update();
 
-            if (gamepad2.left_bumper)
-                shooter.singleShoot(gamepad2.a, gamepad2.b, gamepad2.y);
+            if (gamepad1.dpad_down)
+                shooter.singleShoot(gamepad1.a, gamepad1.b, gamepad1.y);
             else
-                shooter.continousShoot(gamepad2.a, gamepad2.b, gamepad2.y);
+                shooter.continousShoot(gamepad1.a, gamepad1.b, gamepad1.y);
+
+            if (gamepad2.a) {
+                targetVelocity = 1000;
+                shooter.continousShoot(targetVelocity);
+            } else if (gamepad2.b) {
+                targetVelocity = 1100;
+                shooter.continousShoot(targetVelocity);
+            } else if (gamepad2.y) {
+                targetVelocity = 1345;
+                shooter.continousShoot(targetVelocity);
+            }
 
             if (!gamepad2.a && !gamepad2.b && !gamepad2.y) {
 

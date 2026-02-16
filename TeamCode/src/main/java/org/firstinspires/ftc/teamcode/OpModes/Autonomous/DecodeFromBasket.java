@@ -122,7 +122,7 @@ public class DecodeFromBasket extends LinearOpMode {
             stateTimer.reset();
 
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
-                shooter.continousShoot(false, true, false);
+                shooter.continousShoot(1160);
             }
             shooter.resetShooter();
             sleep(1);
@@ -134,7 +134,7 @@ public class DecodeFromBasket extends LinearOpMode {
                     driveTrain.driveStrafe(-11 * mirrorField, 0.9, imu, log, kps, ki, kds);
                 }
                 driveTrain.rotateRelative((i == 0 ? -140 : -132) * mirrorField, imu, log);
-                driveTrain.driveStrafe(26 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.driveStrafe(25 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 shooter.startIntake();
                 driveTrain.driveStraight(40 + i * 5, 0.9, imu, log, kp, ki, kd);
 
@@ -143,12 +143,12 @@ public class DecodeFromBasket extends LinearOpMode {
                 sleep(300);
                 shooter.resetShooter();
                 driveTrain.driveStraight(-40 + i * 5, 0.9, imu, log, kp, ki, kd);
-                driveTrain.driveStrafe(-26 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.driveStrafe(-25 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 driveTrain.rotateRelative((i == 1 ? 138 : 132) * mirrorField, imu, log);
 
                 stateTimer.reset();
                 while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750 - i * 100) {
-                    shooter.continousShoot(i == 0, i != 0, false);
+                    shooter.continousShoot((i == 0 ? 1050 : 1100));
                 }
                 shooter.resetShooter();
             }
