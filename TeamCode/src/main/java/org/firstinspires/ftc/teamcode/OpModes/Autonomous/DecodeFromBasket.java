@@ -99,7 +99,7 @@ public class DecodeFromBasket extends LinearOpMode {
             } else if (gamepad2.dpadDownWasPressed()) {
                 rows--;
             }
-            rows = Math.abs(rows) % 4;
+            rows = Math.abs(rows) % 3;
             telemetry.addData("Rows", rows);
         }
 
@@ -123,8 +123,6 @@ public class DecodeFromBasket extends LinearOpMode {
 
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750) {
                 shooter.continousShoot(false, true, false);
-//                log.d("Shooter", "Timer: " + stateTimer.milliseconds());
-//                sleep(5);
             }
             shooter.resetShooter();
             sleep(1);
@@ -135,21 +133,22 @@ public class DecodeFromBasket extends LinearOpMode {
                 if (i == 0) {
                     driveTrain.driveStrafe(-11 * mirrorField, 0.9, imu, log, kps, ki, kds);
                 }
-                driveTrain.rotateRelative(-140 * mirrorField, imu, log);
-                driveTrain.driveStrafe(27 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative((i == 0 ? -140 : -132) * mirrorField, imu, log);
+                driveTrain.driveStrafe(26 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 shooter.startIntake();
-                driveTrain.driveStraight(38 + i * 3, 0.9, imu, log, kp, ki, kd);
+                driveTrain.driveStraight(40 + i * 5, 0.9, imu, log, kp, ki, kd);
 
                 // keep the intake running for a bit to ensure we get the balls in
+                shooter.startShootServos();
                 sleep(300);
                 shooter.resetShooter();
-                driveTrain.driveStraight(-38 + i * 3, 0.9, imu, log, kp, ki, kd);
-                driveTrain.driveStrafe(-27 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
-                driveTrain.rotateRelative(140 * mirrorField, imu, log);
+                driveTrain.driveStraight(-40 + i * 5, 0.9, imu, log, kp, ki, kd);
+                driveTrain.driveStrafe(-26 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.rotateRelative((i == 1 ? 138 : 132) * mirrorField, imu, log);
 
                 stateTimer.reset();
-                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750 - i * 150) {
-                    shooter.continousShoot(false, true, false);
+                while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 2750 - i * 100) {
+                    shooter.continousShoot(i == 0, i != 0, false);
                 }
                 shooter.resetShooter();
             }

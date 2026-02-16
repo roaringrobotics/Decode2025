@@ -260,6 +260,90 @@ public class Shooter {
             }
         }
     }
+//    public void continousShoot(int velocity) {
+//
+//        // Continuously update voltage reading
+//        double voltage = 0.0;
+//        double v = voltSensor.getVoltage();
+//
+//
+//        if ( ballsLaunched >= 3 && !empty) {
+//            settleCount = 0;
+//            if (allOff) {
+//                ballsLaunched = 0;
+//                // eventually we will add logic to detect if there are balls in the shooter
+//                empty = false;
+//            } else {
+//                empty = true;
+//
+//            }
+//
+//
+//            resetShooter();
+//            //log.d("Shooter", "Setting State: " + ShooterState);
+//            ShooterState = ShooterState.IDLE;
+//
+//        } else if (anyOn) {
+//            double currentVel = shooterMotor.getVelocity();
+//            double currentVelDeg = shooterMotor.getVelocity(AngleUnit.DEGREES);
+//            dashboardTelemetry.addData("vel", currentVel);
+//            dashboardTelemetry.update();
+////            log.d("Shooter", "-----------------------------------");
+////            log.d("Shooter", "Velocity (rag): " + currentVel);
+////            log.d("Shooter", "Velocity (deg): " + currentVelDeg);
+////            log.d("Shooter", "Target Velocity: " + targetVelocity);
+////            log.d("Shooter", "State: " + ShooterState.toString());
+////            log.d("Shooter", "Balls Launched: " + ballsLaunched);
+//            if(ShooterState == ShooterState.IDLE) {
+//                startShooterMotor(targetVelocity);
+//                ShooterState = ShooterState.SPINNING_UP;
+//            }
+//            else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) > allowedError) {
+//                if (lastShooterState == ShooterState.SHOOTING) {
+//                    ballsLaunched++;
+//                    log.d("Shooter", "Balls Launched: " + ballsLaunched);
+//                    log.d("Shooter", "Target: " + targetVelocity);
+//                    log.d("Shooter", "Current Velocity: " + currentVel);
+//                    lastShooterState = ShooterState.SPINNING_UP;
+//                }
+//                settleCount = 0;
+//                startShooterMotor(targetVelocity);
+//
+//            }
+//            else if (ShooterState == ShooterState.SPINNING_UP && (targetVelocity - currentVel) < allowedError) {
+//
+//
+//                // Check settle condition
+////                int lowerEnd = (targetVelocity - settleError);
+////                int upperEnd = (targetVelocity + settleError);
+////                dashboardTelemetry.addData("Settle Count", settleCount);
+////                if (currentVel > lowerEnd && currentVel < upperEnd) {
+////                    settleCount++;
+////                    if (settleCount >= settleCountRequired) {
+////                        ShooterState = ShooterState.SHOOTING;
+////                        startShootServos();
+////                        startIntake();
+////                    }
+////                } else {
+////                    settleCount = 0;
+////                }
+//
+//                ShooterState = ShooterState.SHOOTING;
+//                startShootServos();
+//                startIntake();
+//                startShooterMotor(targetVelocity);
+//
+//
+//            } else if (ShooterState == ShooterState.SHOOTING && (targetVelocity - currentVel) > allowedError) {
+//                startShooterMotor(targetVelocity);
+//                stopIntake();
+//                stopShootServos();
+//                settleCount = 0;
+//                lastShooterState = ShooterState.SHOOTING;
+//                ShooterState = ShooterState.SPINNING_UP;
+//            }
+//        }
+//    }
     public void singleShoot(boolean buttonShort, boolean buttonMid, boolean buttonLong) {
         boolean allOff = !buttonShort && !buttonMid && !buttonLong;
         boolean anyOn = buttonShort || buttonMid || buttonLong;
@@ -323,6 +407,7 @@ public class Shooter {
         }
 
     }
+
 
     public void startIntake() {
             intake.startIntake();
