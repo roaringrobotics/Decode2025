@@ -143,20 +143,20 @@ public class DecodeShort extends LinearOpMode {
             shooter.resetShooter();
             for (int i = 1; i <= rows; i++) {
                 driveTrain.rotateRelative(-113 * mirrorField, imu, log);
-                driveTrain.driveStrafe(-20 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                driveTrain.driveStrafe(-21 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                 shooter.startIntake();
-                driveTrain.driveStraight(40, 0.9, imu, log, kp, ki, kd);
+                driveTrain.driveStraight(42, 0.9, imu, log, kp, ki, kd);
 
                 shooter.startShootServos();
                 sleep(300);
                 shooter.resetShooter();
-                driveTrain.driveStraight(-40, 0.9, imu, log, kp, ki, kd);
+                driveTrain.driveStraight(-42, 0.9, imu, log, kp, ki, kd);
                 if (i <= 1 || stayInTriangle) {
-                    driveTrain.driveStrafe(20 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
+                    driveTrain.driveStrafe(21 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                     driveTrain.rotateRelative(113 * mirrorField, imu, log);
                 } else {
                     driveTrain.driveStrafe(-21 * mirrorField, 0.9, imu, log, kps, ki, kds);
-                    driveTrain.rotateRelative(140 * mirrorField, imu, log);
+                    driveTrain.rotateRelative(137 * mirrorField, imu, log);
                 }
 
                 stateTimer.reset();
@@ -172,7 +172,7 @@ public class DecodeShort extends LinearOpMode {
                     driveTrain.driveStrafe(46, 0.9, imu, log, kps, ki, kds);
 
                 } else {
-                    driveTrain.rotateRelative(130 * mirrorField, imu, log);
+                    driveTrain.rotateRelative(133 * mirrorField, imu, log);
                     driveTrain.driveStraight(-44, 0.9, imu, log, kp, ki, kd);
                     driveTrain.driveStrafe(49, 0.9, imu, log, kps, ki, kds);
                 }
