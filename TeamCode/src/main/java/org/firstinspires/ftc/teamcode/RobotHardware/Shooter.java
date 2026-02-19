@@ -19,7 +19,7 @@ public class Shooter {
     public final CRServo blackServo;
     public long lastTime;
     public double lastVelocity;
-    private int[] velocityBuffer = {(1000), (1100), (1345)};
+    private int[] velocityBuffer = {(1250), (1350), (1550)};
     private int allowedError = 200;
     private Intake intake;
     public AndroidLog log;
@@ -159,8 +159,8 @@ public class Shooter {
     //} else {
     //  stopShooterMotor();
     //}
-    public void getShooterVelocity() {
-        shooterMotor.getVelocity();
+    public double getShooterVelocity() {
+        return shooterMotor.getVelocity();
     }
 
     int settleCountRequired = 15;
@@ -409,6 +409,9 @@ public class Shooter {
         stopIntake();
         stopShooterMotor();
         stopShootServos();
+    }
+    public void setPIDValues(double kp, double ki, double kd) {
+        shooterMotor.setVelocityPIDFCoefficients(kp, ki, kd, 0);
     }
 }
 

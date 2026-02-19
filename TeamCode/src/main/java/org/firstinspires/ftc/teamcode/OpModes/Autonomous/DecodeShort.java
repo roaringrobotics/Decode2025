@@ -1,11 +1,14 @@
 // language: java
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
@@ -86,7 +89,8 @@ public class DecodeShort extends LinearOpMode {
         telemetry.update();
         imu.reset();
 
-
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
         // show init telemetry until start pressed
         while (!isStarted() && !isStopRequested()) {
             telemetry.addData("Hint", "Waiting for start - update sensors/vision here");
@@ -138,7 +142,7 @@ public class DecodeShort extends LinearOpMode {
             driveTrain.rotateRelative(23 * mirrorField, imu, log);
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
-                shooter.continousShoot(1440);
+                shooter.continousShoot(1550);
             }
             shooter.resetShooter();
             for (int i = 1; i <= rows; i++) {
@@ -161,7 +165,9 @@ public class DecodeShort extends LinearOpMode {
 
                 stateTimer.reset();
                 while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < (i == 1 ? 4000 : 2750)) {
-                    shooter.continousShoot((i > 1 ? 1100 : 1360));
+                    shooter.continousShoot((i > 1 ? 1350 : 1550));
+                    dashboardTelemetry.addData("Velocity", shooter.getShooterVelocity());
+                    dashboardTelemetry.update();
                 }
                 shooter.resetShooter();
 
