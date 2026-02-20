@@ -177,12 +177,12 @@ public class DecodeShort extends LinearOpMode {
             if (collectFromBasket || rows <= 1) {
                 if (rows <= 1 || stayInTriangle) {
                     driveTrain.rotateRelative(157 * mirrorField, imu, log);
-                    driveTrain.driveStrafe(46, 0.9, imu, log, kps, ki, kds);
+                    driveTrain.driveStrafe(46 * mirrorField, 0.9, imu, log, kps, ki, kds);
 
                 } else {
                     driveTrain.rotateRelative(133 * mirrorField, imu, log);
                     driveTrain.driveStraight(-44, 0.9, imu, log, kp, ki, kd);
-                    driveTrain.driveStrafe(49, 0.9, imu, log, kps, ki, kds);
+                    driveTrain.driveStrafe(49 * mirrorField, 0.9, imu, log, kps, ki, kds);
                 }
 //                driveTrain.rotateRelative(-90 * mirrorField, imu, log);
                 shooter.startIntake();
@@ -195,7 +195,7 @@ public class DecodeShort extends LinearOpMode {
                 sleep(12000);
             } else {
                 driveTrain.rotateRelative(-140 * mirrorField, imu, log);
-                driveTrain.driveStrafe(-38, 0.9, imu, log, kps, ki, kds);
+                driveTrain.driveStrafe(-38 * mirrorField, 0.9, imu, log, kps, ki, kds);
             }
 
     }   catch (Exception e) {
