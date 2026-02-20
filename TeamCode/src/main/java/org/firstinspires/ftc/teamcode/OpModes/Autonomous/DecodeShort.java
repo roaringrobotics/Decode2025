@@ -142,7 +142,7 @@ public class DecodeShort extends LinearOpMode {
             driveTrain.rotateRelative(23 * mirrorField, imu, log);
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
-                shooter.continousShoot(1550);
+                shooter.continousShoot(1450);
             }
             shooter.resetShooter();
             for (int i = 1; i <= rows; i++) {
@@ -165,7 +165,7 @@ public class DecodeShort extends LinearOpMode {
 
                 stateTimer.reset();
                 while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < (i == 1 ? 4000 : 2750)) {
-                    shooter.continousShoot((i > 1 ? 1350 : 1550));
+                    shooter.continousShoot((i > 1 ? 1150 : 1550));
                     dashboardTelemetry.addData("Velocity", shooter.getShooterVelocity());
                     dashboardTelemetry.update();
                 }

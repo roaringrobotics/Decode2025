@@ -19,7 +19,7 @@ public class Shooter {
     public final CRServo blackServo;
     public long lastTime;
     public double lastVelocity;
-    private int[] velocityBuffer = {(1250), (1350), (1550)};
+    private int[] velocityBuffer = {(1000), (1100), (1345)};
     private int allowedError = 200;
     private Intake intake;
     public AndroidLog log;
