@@ -30,7 +30,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 */
 
 
-@Autonomous(name = "Shoot From Triangle")
+@Autonomous(name = "Shoot From Back")
 public class DecodeShort extends LinearOpMode {
 
     private DriveTrain driveTrain;
@@ -138,11 +138,12 @@ public class DecodeShort extends LinearOpMode {
 
         // Start autonomous
         try {
+            shooter.startShooterMotor(1350);
             driveTrain.driveStraight(-6, .8, imu, log, kp, ki, kd);
             driveTrain.rotateRelative(23 * mirrorField, imu, log);
             stateTimer.reset();
             while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < 4000) {
-                shooter.continousShoot(1450);
+                shooter.continousShoot(1475);
             }
             shooter.resetShooter();
             for (int i = 1; i <= rows; i++) {
@@ -154,18 +155,19 @@ public class DecodeShort extends LinearOpMode {
                 shooter.startShootServos();
                 sleep(300);
                 shooter.resetShooter();
+                shooter.startShooterMotor((i > 1 ? 1100 : 1350));
                 driveTrain.driveStraight(-42, 0.9, imu, log, kp, ki, kd);
                 if (i <= 1 || stayInTriangle) {
                     driveTrain.driveStrafe(21 * i * mirrorField, 0.9, imu, log, kps, ki, kds);
                     driveTrain.rotateRelative(113 * mirrorField, imu, log);
                 } else {
                     driveTrain.driveStrafe(-21 * mirrorField, 0.9, imu, log, kps, ki, kds);
-                    driveTrain.rotateRelative(137 * mirrorField, imu, log);
+                    driveTrain.rotateRelative(138 * mirrorField, imu, log);
                 }
 
                 stateTimer.reset();
                 while (shooter.getBallsLaunched() < 3 && opModeIsActive() && stateTimer.milliseconds() < (i == 1 ? 4000 : 2750)) {
-                    shooter.continousShoot((i > 1 ? 1150 : 1550));
+                    shooter.continousShoot((i > 1 ? 1150 : 1475));
                     dashboardTelemetry.addData("Velocity", shooter.getShooterVelocity());
                     dashboardTelemetry.update();
                 }
@@ -190,7 +192,7 @@ public class DecodeShort extends LinearOpMode {
                 shooter.startShootServos();
                 shooter.startIntake();
                 // sleep until auto is over
-                sleep(30000);
+                sleep(12000);
             } else {
                 driveTrain.rotateRelative(-140 * mirrorField, imu, log);
                 driveTrain.driveStrafe(-38, 0.9, imu, log, kps, ki, kds);
