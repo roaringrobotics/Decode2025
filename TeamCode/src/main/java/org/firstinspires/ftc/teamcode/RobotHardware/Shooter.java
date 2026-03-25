@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 
 public class Shooter {
     private final DcMotorEx shooterMotor;
+    private final DcMotorEx shooterMotor2;
     public final CRServo blueServo;
     public final CRServo blackServo;
     public long lastTime;
@@ -42,6 +43,7 @@ public class Shooter {
 
     public Shooter(HardwareMap hardwareMap, Intake in, AndroidLog logIn) {
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
+        shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooter2");
         intake = in;
         ShooterState = ShooterState.IDLE;
         log = logIn;
@@ -62,13 +64,16 @@ public class Shooter {
 
         //Reverse bottom motor so both spin the same physical direction
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        shooterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
         // Default to BRAKE when power is zero
         shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        shooterMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         // Reset encoder counts first (optional but recommended)
         shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         // Switch to RUN_USING_ENCODER mode
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooterMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void updateKinematics(long currentTime) {
@@ -79,18 +84,22 @@ public class Shooter {
 
     public void startShooterMotor(double velocity) {
         shooterMotor.setVelocity(velocity);
+        shooterMotor2.setVelocity(velocity);
     }
 
     public void stopShooterMotor() {
         shooterMotor.setVelocity(0.0);
+        shooterMotor2.setVelocity(0.0);
     }
 
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
         shooterMotor.setZeroPowerBehavior(behavior);
+        shooterMotor2.setZeroPowerBehavior(behavior);
     }
 
     private void setRunMode(DcMotor.RunMode mode) {
         shooterMotor.setMode(mode);
+        shooterMotor2.setMode(mode);
     }
 
 
@@ -412,6 +421,7 @@ public class Shooter {
     }
     public void setPIDValues(double kp, double ki, double kd) {
         shooterMotor.setVelocityPIDFCoefficients(kp, ki, kd, 0);
+        shooterMotor2.setVelocityPIDFCoefficients(kp, ki, kd, 0);
     }
 }
 
