@@ -614,7 +614,7 @@ public class DriveTrain {
             log.d("DriveStrafe", "Complete. Traveled: " + distanceTraveled);
         }
     }
-    public double powerScaler(boolean    halfSpeed, boolean quarterSpeed) {
+    public double powerScaler(boolean halfSpeed, boolean quarterSpeed) {
         double powerScale;
         if (halfSpeed) {
             powerScale = 0.5;
@@ -625,4 +625,21 @@ public class DriveTrain {
         }
         return powerScale;
     }
+    public void driveRobotCentric(double robotX, double robotY, double rightStickX, // rightStickX rotates the robot
+                                  double powerScale){
+
+        double vectorSum = Math.abs(robotX) + Math.abs(robotY) + Math.abs(rightStickX);
+        double denom = Math.max(vectorSum, 1.0);
+
+        double frontLeftPower = (-robotY + robotX + rightStickX) / denom;
+        double backLeftPower = (robotY + robotX + rightStickX) / denom;
+        double frontRightPower = (robotY + robotX - rightStickX) / denom;
+        double backRightPower = (-robotY + robotX - rightStickX) / denom;
+
+        setFrontLeftPower(frontLeftPower * powerScale);
+        setBackLeftPower(backLeftPower * powerScale);
+        setBackRightPower(frontRightPower * powerScale);
+        setFrontRightPower(backRightPower * powerScale);
+    }
+
 }

@@ -66,6 +66,8 @@ public class TeleOpDecode extends LinearOpMode {
             } else if (gamepad2.y) {
                 targetVelocity = 1345;
                 shooter.continousShoot(targetVelocity);
+            } else if (gamepad2.x) {
+                shooter.startShooterMotor(6000);
             }
 
             if (!gamepad2.a && !gamepad2.b && !gamepad2.y) {

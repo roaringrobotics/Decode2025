@@ -19,7 +19,7 @@ public class Hardware {
 
     public Hardware(HardwareMap hardwareMap) {
         InitImu(hardwareMap);
-    }
+    } // only Imu stuff
 
     private void InitImu(HardwareMap hardwareMap) {
         // Initialize IMU and Encoders.  imuPos can be internal IMU/Encoders or Pinpoint computer.
