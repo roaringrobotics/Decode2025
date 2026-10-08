@@ -1,15 +1,17 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
-import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
-import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
-import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
-@TeleOp
-public class robotCentric extends LinearOpMode {
+import com.acmerobotics.dashboard.FtcDashboard;
+
+@TeleOp(name = "Robot Centric Drive", group = "Test")
+public class RobotCentric extends LinearOpMode {
     private DriveTrain driveTrain;
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
     public void runOpMode() throws InterruptedException {
         driveTrain = new DriveTrain(hardwareMap);
@@ -18,11 +20,10 @@ public class robotCentric extends LinearOpMode {
         while (opModeIsActive()) {
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
             double fieldX = -gamepad1.left_stick_x;
-            double fieldY = -gamepad1.left_stick_y; // the negative is a hotfix
+            double fieldY = -gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
 
-            telemetry.addData("Power Scale", powerScale);
-            telemetry.update();
+
             driveTrain.driveRobotCentric(fieldX, fieldY, rotate, powerScale);
         }
     }

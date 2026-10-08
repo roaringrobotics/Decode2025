@@ -636,6 +636,12 @@ public class DriveTrain {
         double frontRightPower = (robotY - robotX - rightStickX); // denom;
         double backRightPower = (robotY + robotX - rightStickX); // denom;
 
+        dashboardTelemetry.addData("Front Left Power", frontLeftPower);
+        dashboardTelemetry.addData("Back Left Power", backLeftPower);
+        dashboardTelemetry.addData("Front Right Power", frontRightPower);
+        dashboardTelemetry.addData("Back Right Power", backRightPower);
+        dashboardTelemetry.update();
+
         setFrontLeftPower(frontLeftPower * powerScale);
         setBackLeftPower(backLeftPower * powerScale);
         setBackRightPower(frontRightPower * powerScale);
