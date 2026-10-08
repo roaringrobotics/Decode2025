@@ -631,10 +631,10 @@ public class DriveTrain {
         double vectorSum = Math.abs(robotX) + Math.abs(robotY) + Math.abs(rightStickX);
         double denom = Math.max(vectorSum, 1.0);
 
-        double frontLeftPower = (-robotY + robotX + rightStickX) / denom;
-        double backLeftPower = (robotY + robotX + rightStickX) / denom;
-        double frontRightPower = (robotY + robotX - rightStickX) / denom;
-        double backRightPower = (-robotY + robotX - rightStickX) / denom;
+        double frontLeftPower = (robotY - robotX + rightStickX); // denom;
+        double backLeftPower = (robotY + robotX + rightStickX); // denom;
+        double frontRightPower = (robotY - robotX - rightStickX); // denom;
+        double backRightPower = (robotY + robotX - rightStickX); // denom;
 
         setFrontLeftPower(frontLeftPower * powerScale);
         setBackLeftPower(backLeftPower * powerScale);

@@ -17,8 +17,8 @@ public class robotCentric extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             double powerScale = driveTrain.powerScaler(gamepad1.right_bumper, gamepad1.left_bumper);
-            double fieldX = -gamepad1.left_stick_y;
-            double fieldY = -gamepad1.left_stick_x; // the negative is a hotfix
+            double fieldX = -gamepad1.left_stick_x;
+            double fieldY = -gamepad1.left_stick_y; // the negative is a hotfix
             double rotate = gamepad1.right_stick_x;
 
             telemetry.addData("Power Scale", powerScale);
