@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
   - helper methods to set/stop drive power
 */
 
-@Autonomous(name = "From Basket")
+
 public class DecodeFromBasket extends LinearOpMode {
 
     private DriveTrain driveTrain;

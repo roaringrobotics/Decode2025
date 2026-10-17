@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Hardware;
 import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
 import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 
-@TeleOp(name = "Single Controller", group = "Test")
 public class DecodeSingleTeleop extends LinearOpMode {
     private DriveTrain driveTrain;
     private Shooter shooter;

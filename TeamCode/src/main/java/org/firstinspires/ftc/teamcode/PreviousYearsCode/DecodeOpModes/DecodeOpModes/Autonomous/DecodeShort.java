@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 */
 
 
-@Autonomous(name = "Shoot From Back")
+
 public class DecodeShort extends LinearOpMode {
 
     private DriveTrain driveTrain;

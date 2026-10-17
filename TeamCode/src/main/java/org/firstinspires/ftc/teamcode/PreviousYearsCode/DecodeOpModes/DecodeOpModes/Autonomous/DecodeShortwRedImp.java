@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
 import org.firstinspires.ftc.teamcode.RobotHardware.PinpointImpl;
 import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 
-@Autonomous(name = "Shoot From Back")
+
 public class DecodeShortwRedImp extends LinearOpMode {
 
     private DriveTrain driveTrain;

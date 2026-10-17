@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Intake;
 import org.firstinspires.ftc.teamcode.RobotHardware.PinpointImpl;
 import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 
-@Autonomous(name = "From Basket")
+
 public class DecodeFromBasketwRedImp extends LinearOpMode {
 
     private DriveTrain driveTrain;

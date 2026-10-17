@@ -158,19 +158,27 @@ public class DriveTrain {
             double rotate,
             double botHeading) {
         FieldCentricPowerLevels out = new FieldCentricPowerLevels();
+
         // Invert Y axis if needed.  Using gobilda pinpoint convention.
-        // Y is horizontal field direction with positive to the left.
         double fy = -fieldY;
-        double robotY = fy * Math.cos(-botHeading) - fieldX * Math.sin(-botHeading);
-        double robotX = fy * Math.sin(-botHeading) + fieldX * Math.cos(-botHeading);
+        double fx = -fieldX;
+
+        // Y is forward (vertical) direction, X is the strafe (horizontal direction)
+        double robotY = fy * Math.cos(-botHeading) + fieldX * Math.sin(-botHeading);
+        double robotX = -fy * Math.sin(-botHeading) + fieldX * Math.cos(-botHeading);
 
         // Normalize output power [-1.0-1.0]
         double vectorSum = Math.abs(robotX) + Math.abs(robotY) + Math.abs(rotate);
         double denom = Math.max(vectorSum, 1.0);
 
+//        out.frontLeftPower = (robotY + robotX + rotate) / denom;
+//        out.backLeftPower = (-robotY + robotX + rotate) / denom;
+//        out.frontRightPower = (-robotY + robotX - rotate) / denom;
+//        out.backRightPower = (robotY + robotX - rotate) / denom;
+
         out.frontLeftPower = (robotY + robotX + rotate) / denom;
-        out.backLeftPower = (-robotY + robotX + rotate) / denom;
-        out.frontRightPower = (-robotY + robotX - rotate) / denom;
+        out.backLeftPower = (robotY - robotX + rotate) / denom;
+        out.frontRightPower = (robotY - robotX - rotate) / denom;
         out.backRightPower = (robotY + robotX - rotate) / denom;
 
         return out;
