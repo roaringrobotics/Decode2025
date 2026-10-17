@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
 import com.acmerobotics.dashboard.FtcDashboard;
 
+// This code only contains code for robot centric drive
+// no addons
 @TeleOp(name = "Robot Centric Drive", group = "Test")
 public class RobotCentric extends LinearOpMode {
     private DriveTrain driveTrain;
