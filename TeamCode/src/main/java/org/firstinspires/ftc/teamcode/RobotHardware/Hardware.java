@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.Interfaces.ImuPositionI;
 import org.firstinspires.ftc.teamcode.Interfaces.TimeSourceI;
 
 // Initializes and tracks the Robot Hardware.
+// This class should be removed soon
 public class Hardware {
 
 

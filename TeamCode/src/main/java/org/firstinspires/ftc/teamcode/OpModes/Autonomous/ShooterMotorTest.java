@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 
-@Autonomous(name = "Shooter Motor PID", group = "test")
+// @Autonomous(name = "Shooter Motor PID", group = "Test")
 public class ShooterMotorTest extends LinearOpMode {
     private Shooter shooter;
     private Intake intake;
@@ -32,23 +32,6 @@ public class ShooterMotorTest extends LinearOpMode {
         PowerRampController rampDrive = new PowerRampController(
                 .1,
                 new SystemTimeSource());
-
-
-//        Through testing y's and x's are flipped
-//        instead of:
-//                y
-//                |
-//                |
-//       ------------------x
-//                |
-//                |
-//         we have:
-//                x
-//                |
-//                |
-//       ------------------y
-//                |
-//                |
 
         double y = 0;
         double x = 0;
@@ -97,7 +80,6 @@ public class ShooterMotorTest extends LinearOpMode {
             dashboardTelemetry.addData("kp", kp);
             dashboardTelemetry.addData("kd", kd);
             dashboardTelemetry.update();
-//            shooter.continousShoot(1000);
 
         }
     }

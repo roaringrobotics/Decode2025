@@ -162,12 +162,6 @@ public class Shooter {
         }
     }
 
-    //public void toggleShootMotor() {
-    //if (shooterMotor.getPower() == 0.0) {
-    //  startShooterMotor();
-    //} else {
-    //  stopShooterMotor();
-    //}
     public double getShooterVelocity() {
         return shooterMotor.getVelocity();
     }
