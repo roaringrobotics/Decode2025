@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.RobotHardware.DriveTrain;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -21,6 +23,8 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
     @TeleOp
     public class TeleOpBiobuzz extends LinearOpMode {
         private DriveTrain driveTrain;
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
         private Hardware imu;
         public void runOpMode() throws InterruptedException {
             driveTrain = new DriveTrain(hardwareMap);

@@ -300,8 +300,9 @@ public class DriveTrain {
         imu.reset();
         imu.update();
         Pose2D startPose = imu.getPose();
+
         if (isRed) {
-            y = -y;
+            x = -x;
             endDegrees = -endDegrees;
         }
         // Calculate target pose in field coordinates
@@ -315,7 +316,7 @@ public class DriveTrain {
         double targetDistance = Math.sqrt(x * x + y * y);
 
         // PID controllers
-        PID drivePID = new PID(0.23, ki, 0);     // For position control
+        PID drivePID = new PID(0.53, ki, 0);     // For position control
         PID rotatePID = new PID(kp, ki, kd); // For rotation control
 
         final double distanceTolerance = 0.5;  // inches
@@ -337,8 +338,8 @@ public class DriveTrain {
             double curHeading = curPose.getHeading(AngleUnit.DEGREES);
 
             // Calculate remaining distance to target
-            double deltaX = targetPose.getX(DistanceUnit.INCH) - curPose.getX(DistanceUnit.INCH);
-            double deltaY = targetPose.getY(DistanceUnit.INCH) - curPose.getY(DistanceUnit.INCH);
+            double deltaX = curPose.getX(DistanceUnit.INCH) - targetPose.getX(DistanceUnit.INCH);
+            double deltaY = curPose.getY(DistanceUnit.INCH) - targetPose.getY(DistanceUnit.INCH);
             double remainingDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
             // Calculate heading error
@@ -374,8 +375,8 @@ public class DriveTrain {
                 double dirX = deltaX / remainingDistance;
                 double dirY = deltaY / remainingDistance;
 
-                driveX = dirX * driveMagnitude;
-                driveY = dirY * driveMagnitude;
+                driveX = dirY * driveMagnitude;
+                driveY = dirX * driveMagnitude;
             }
 
             // Calculate rotation power
@@ -391,21 +392,22 @@ public class DriveTrain {
             }
 
             double botHeadingRad = Math.toRadians(curHeading);
-            double robotX = driveY * Math.cos(-botHeadingRad) - driveX * Math.sin(-botHeadingRad);
-            double robotY = driveY * Math.sin(-botHeadingRad) + driveX * Math.cos(-botHeadingRad);
+//            double robotY = fy * Math.cos(-botHeading) + fieldX * Math.sin(-botHeading);
+//            double robotX = -fy * Math.sin(-botHeading) + fieldX * Math.cos(-botHeading);
+            double robotX = driveY * Math.cos(botHeadingRad) - driveX * Math.sin(botHeadingRad);
+            double robotY = driveY * Math.sin(botHeadingRad) + driveX * Math.cos(botHeadingRad);
 
             // Invert Y axis.  Using gobilda pinpoint convention.
             // Y is horizontal field direction with positive to the left.
-            robotY = -1.0 * robotY;
 
             // Calculate mecanum wheel powers
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
-            double flPower = (robotY + robotX + rotatePower) / denom;
-            double blPower = (-robotY + robotX + rotatePower) / denom;
-            double frPower = (-robotY + robotX - rotatePower) / denom;
-            double brPower = (robotY + robotX - rotatePower) / denom;
+            double flPower = (robotY - robotX + rotatePower) / denom;
+            double blPower = (robotY + robotX + rotatePower) / denom;
+            double frPower = (robotY + robotX - rotatePower) / denom;
+            double brPower = (robotY - robotX - rotatePower) / denom;
 
             // Apply power limit and signs (matching your motor configuration)
 
@@ -415,11 +417,13 @@ public class DriveTrain {
             setBackRightPower(brPower * power);
 
             dashboardTelemetry.addData("DriveLinear",
-                    String.format("rem: %.3f | hErr: %.2f | pos: (%.2f, %.2f) | tgt: (%.2f, %.2f) | power: (FL: %.3f, FR: %.3f, BL: %.3f, BR: %.3f)",
-                    remainingDistance, headingError,
+                    String.format("rem: %.3f | deltaX %3f | deltaY %3f | hErr: %.2f | pos: (%.2f, %.2f) | tgt: (%.2f, %.2f) | power: (FL: %.3f, FR: %.3f, BL: %.3f, BR: %.3f)",
+                    remainingDistance, deltaX, deltaY, headingError,
                     curPose.getX(DistanceUnit.INCH), curPose.getY(DistanceUnit.INCH),
                     targetPose.getX(DistanceUnit.INCH), targetPose.getY(DistanceUnit.INCH),
                     flPower * power, frPower * power, blPower * power, brPower * power));
+
+            dashboardTelemetry.update();
 
             sleep(1);
         }

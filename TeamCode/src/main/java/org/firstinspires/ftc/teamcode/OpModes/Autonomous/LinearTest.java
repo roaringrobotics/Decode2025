@@ -27,9 +27,7 @@ import org.firstinspires.ftc.teamcode.RobotHardware.Shooter;
 public class LinearTest extends LinearOpMode {
 
     private DriveTrain driveTrain;
-    private Shooter shooter;
     private PinpointImpl imu;
-    private Intake intake;
     private final AndroidLog log = new AndroidLog();
 
 
@@ -43,8 +41,6 @@ public class LinearTest extends LinearOpMode {
     public void runOpMode() {
         driveTrain = new DriveTrain(hardwareMap);
         imu = new PinpointImpl(hardwareMap);
-        intake = new Intake(hardwareMap);
-        shooter = new Shooter(hardwareMap, intake, log);
 
         PowerRampController rampDrive = new PowerRampController(
                 .1,
@@ -54,22 +50,6 @@ public class LinearTest extends LinearOpMode {
         double kd = 0;
 
         boolean isRed = false;
-
-//        Through testing y's and x's are flipped
-//        instead of:
-//                y
-//                |
-//                |
-//       ------------------x
-//                |
-//                |
-//         we have:
-//                x
-//                |
-//                |
-//       ------------------y
-//                |
-//                |
 
         double y = 0;
         double x = 0;
@@ -132,7 +112,7 @@ public class LinearTest extends LinearOpMode {
         // Start autonomous
         stateTimer.reset();
         try {
-            driveTrain.driveToRelative(0, 0, 45, 0.5, isRed, imu, log, kp, ki, kd);
+            driveTrain.driveToRelative(2, 0, 0, 0.25, isRed, imu, log, kp, ki, kd);
             driveTrain.stopMotors();
         } catch (Exception e) {
             throw new RuntimeException(e);
