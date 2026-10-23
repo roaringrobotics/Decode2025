@@ -338,8 +338,8 @@ public class DriveTrain {
             double curHeading = curPose.getHeading(AngleUnit.DEGREES);
 
             // Calculate remaining distance to target
-            double deltaX = curPose.getX(DistanceUnit.INCH) - targetPose.getX(DistanceUnit.INCH);
-            double deltaY = curPose.getY(DistanceUnit.INCH) - targetPose.getY(DistanceUnit.INCH);
+            double deltaX = targetPose.getX(DistanceUnit.INCH) - curPose.getX(DistanceUnit.INCH);
+            double deltaY = targetPose.getY(DistanceUnit.INCH) - curPose.getY(DistanceUnit.INCH);
             double remainingDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
             // Calculate heading error
@@ -381,33 +381,29 @@ public class DriveTrain {
 
             // Calculate rotation power
             double rotatePower = 0.0;
-            if (!headingOnTarget) {
-                rotatePower = rotatePID.calculate(endDegrees, curHeading);
-                rotatePower = -rotatePower;
-
-                // Apply minimum rotation power
-                if (Math.abs(rotatePower) < minRotatePower && Math.abs(headingError) > angleTolerance) {
-                    rotatePower = minRotatePower * Math.signum(rotatePower);
-                }
-            }
+//            if (!headingOnTarget) {
+//                rotatePower = rotatePID.calculate(endDegrees, curHeading);
+//                rotatePower = -rotatePower;
+//
+//                // Apply minimum rotation power
+//                if (Math.abs(rotatePower) < minRotatePower && Math.abs(headingError) > angleTolerance) {
+//                    rotatePower = minRotatePower * Math.signum(rotatePower);
+//                }
+//            }
 
             double botHeadingRad = Math.toRadians(curHeading);
-//            double robotY = fy * Math.cos(-botHeading) + fieldX * Math.sin(-botHeading);
-//            double robotX = -fy * Math.sin(-botHeading) + fieldX * Math.cos(-botHeading);
             double robotX = driveY * Math.cos(botHeadingRad) - driveX * Math.sin(botHeadingRad);
             double robotY = driveY * Math.sin(botHeadingRad) + driveX * Math.cos(botHeadingRad);
 
-            // Invert Y axis.  Using gobilda pinpoint convention.
-            // Y is horizontal field direction with positive to the left.
 
             // Calculate mecanum wheel powers
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
-            double flPower = (robotY - robotX + rotatePower) / denom;
-            double blPower = (robotY + robotX + rotatePower) / denom;
-            double frPower = (robotY + robotX - rotatePower) / denom;
-            double brPower = (robotY - robotX - rotatePower) / denom;
+            double flPower = (robotY + robotX + rotatePower) / denom;
+            double blPower = (robotY - robotX + rotatePower) / denom;
+            double frPower = (robotY - robotX - rotatePower) / denom;
+            double brPower = (robotY + robotX - rotatePower) / denom;
 
             // Apply power limit and signs (matching your motor configuration)
 
@@ -417,11 +413,11 @@ public class DriveTrain {
             setBackRightPower(brPower * power);
 
             dashboardTelemetry.addData("DriveLinear",
-                    String.format("rem: %.3f | deltaX %3f | deltaY %3f | hErr: %.2f | pos: (%.2f, %.2f) | tgt: (%.2f, %.2f) | power: (FL: %.3f, FR: %.3f, BL: %.3f, BR: %.3f)",
+                    String.format("rem: %.3f | deltaX %3f | deltaY %3f | hErr: %.2f | pos: (%.2f, %.2f) | tgt: (%.2f, %.2f) | power: (robotY: %.3f, robotX: %.3f, BL: %.3f, BR: %.3f)",
                     remainingDistance, deltaX, deltaY, headingError,
                     curPose.getX(DistanceUnit.INCH), curPose.getY(DistanceUnit.INCH),
                     targetPose.getX(DistanceUnit.INCH), targetPose.getY(DistanceUnit.INCH),
-                    flPower * power, frPower * power, blPower * power, brPower * power));
+                            robotY, frPower * robotX, blPower * power, brPower * power));
 
             dashboardTelemetry.update();
 
