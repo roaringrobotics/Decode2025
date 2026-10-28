@@ -343,6 +343,7 @@ public class DriveTrain {
             double remainingDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
             // Calculate heading error
+            // I think this is what is causing the problems with rotating
             double headingError = endDegrees - curHeading;
             while (headingError > 180) headingError -= 360;
             while (headingError <= -180) headingError += 360;
@@ -381,29 +382,28 @@ public class DriveTrain {
 
             // Calculate rotation power
             double rotatePower = 0.0;
-//            if (!headingOnTarget) {
-//                rotatePower = rotatePID.calculate(endDegrees, curHeading);
-//                rotatePower = -rotatePower;
-//
-//                // Apply minimum rotation power
-//                if (Math.abs(rotatePower) < minRotatePower && Math.abs(headingError) > angleTolerance) {
-//                    rotatePower = minRotatePower * Math.signum(rotatePower);
-//                }
-//            }
+            if (!headingOnTarget) {
+                rotatePower = rotatePID.calculate(endDegrees, curHeading);
+
+                // Apply minimum rotation power
+                if (Math.abs(rotatePower) < minRotatePower && Math.abs(headingError) > angleTolerance) {
+                    rotatePower = minRotatePower * Math.signum(rotatePower);
+                }
+            }
 
             double botHeadingRad = Math.toRadians(curHeading);
-            double robotX = driveY * Math.cos(botHeadingRad) - driveX * Math.sin(botHeadingRad);
-            double robotY = driveY * Math.sin(botHeadingRad) + driveX * Math.cos(botHeadingRad);
+            double robotX = driveY * Math.cos(-botHeadingRad) - driveX * Math.sin(-botHeadingRad);
+            double robotY = driveY * Math.sin(-botHeadingRad) + driveX * Math.cos(-botHeadingRad);
 
 
             // Calculate mecanum wheel powers
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
-            double flPower = (robotY + robotX + rotatePower) / denom;
-            double blPower = (robotY - robotX + rotatePower) / denom;
-            double frPower = (robotY - robotX - rotatePower) / denom;
-            double brPower = (robotY + robotX - rotatePower) / denom;
+            double flPower = (robotY + robotX - rotatePower) / denom;
+            double blPower = (robotY - robotX - rotatePower) / denom;
+            double frPower = (robotY - robotX + rotatePower) / denom;
+            double brPower = (robotY + robotX + rotatePower) / denom;
 
             // Apply power limit and signs (matching your motor configuration)
 
@@ -413,11 +413,11 @@ public class DriveTrain {
             setBackRightPower(brPower * power);
 
             dashboardTelemetry.addData("DriveLinear",
-                    String.format("rem: %.3f | deltaX %3f | deltaY %3f | hErr: %.2f | pos: (%.2f, %.2f) | tgt: (%.2f, %.2f) | power: (robotY: %.3f, robotX: %.3f, BL: %.3f, BR: %.3f)",
-                    remainingDistance, deltaX, deltaY, headingError,
-                    curPose.getX(DistanceUnit.INCH), curPose.getY(DistanceUnit.INCH),
-                    targetPose.getX(DistanceUnit.INCH), targetPose.getY(DistanceUnit.INCH),
-                            robotY, frPower * robotX, blPower * power, brPower * power));
+                    String.format(
+                            "endDegrees: %.3f | curDegrees: %.3f | error %.3f | hot %b | pot %b | sc %d",
+                            endDegrees, curHeading, headingError,
+                            headingOnTarget,
+                            positionOnTarget, settleCount));
 
             dashboardTelemetry.update();
 
