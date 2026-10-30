@@ -1,11 +1,13 @@
 // language: java
 package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Implementations.AndroidLog;
 import org.firstinspires.ftc.teamcode.Implementations.SystemTimeSource;
 import org.firstinspires.ftc.teamcode.Pathing.PowerRampController;
@@ -29,6 +31,8 @@ public class LinearTest extends LinearOpMode {
     private DriveTrain driveTrain;
     private PinpointImpl imu;
     private final AndroidLog log = new AndroidLog();
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
 
     // Hardware placeholders - change names to match your robot configuration
@@ -113,6 +117,8 @@ public class LinearTest extends LinearOpMode {
         stateTimer.reset();
         try {
             driveTrain.driveToRelative(0, 0, 90, 0.25, isRed, imu, log, kp, ki, kd);
+            dashboardTelemetry.addData("Done!", "");
+            dashboardTelemetry.update();
             driveTrain.stopMotors();
         } catch (Exception e) {
             throw new RuntimeException(e);

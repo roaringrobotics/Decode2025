@@ -343,7 +343,6 @@ public class DriveTrain {
             double remainingDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
             // Calculate heading error
-            // I think this is what is causing the problems with rotating
             double headingError = endDegrees - curHeading;
             while (headingError > 180) headingError -= 360;
             while (headingError <= -180) headingError += 360;
@@ -400,6 +399,10 @@ public class DriveTrain {
             double vectorSum = Math.abs(robotY) + Math.abs(robotX) + Math.abs(rotatePower);
             double denom = Math.max(vectorSum, 1.0);
 
+            // Testing values for rotation
+            robotY = 0.0;
+            robotX = 0.0;
+
             double flPower = (robotY + robotX - rotatePower) / denom;
             double blPower = (robotY - robotX - rotatePower) / denom;
             double frPower = (robotY - robotX + rotatePower) / denom;
@@ -418,6 +421,11 @@ public class DriveTrain {
                             endDegrees, curHeading, headingError,
                             headingOnTarget,
                             positionOnTarget, settleCount));
+
+            dashboardTelemetry.addData("Power Levels",
+                    String.format("robotY: %.2f | robotX: %.2f | rotatePower %.2f | demon: %.2f",
+                    robotY, robotX, rotatePower, denom));
+
 
             dashboardTelemetry.update();
 

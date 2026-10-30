@@ -13,7 +13,8 @@ public class PID {
 
     public double calculate(double target, double current) {
         double error = target - current;
-        integral += error;
+        // This line will give an undefined value if included after enough time, we should put a limit on it when we come time to needing the integral
+        // integral += error;
         double derivative = error - previousError;
         previousError = error;
 
